@@ -4,3 +4,6 @@ output/
 .playwright-cli/
 .DS_Store
 data/
+.env
+.env.*
+!.env.example

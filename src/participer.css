@@ -74,16 +74,6 @@ audio{width:100%;max-width:420px;margin-top:16px}
 .form-submit .note{font-size:13px;color:var(--muted)}
 .form-submit .link{background:none;border:0;border-bottom:1px solid currentColor;padding:0 0 2px;cursor:pointer}
 
-/* — Notice de traitement en modale — */
-.notice-modal{width:min(680px,calc(100vw - 32px));max-height:min(80vh,720px);padding:0;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);overflow:auto}
-.notice-modal::backdrop{background:rgba(6,38,92,.55)}
-.notice-head{position:sticky;top:0;display:flex;gap:24px;align-items:baseline;justify-content:space-between;padding:24px;border-bottom:1px solid var(--line);background:#fff}
-.notice-head h2{font-size:18px}
-.notice-body{padding:24px;display:grid;gap:16px}
-.notice-body p{font-size:14px;line-height:1.65;color:var(--muted)}
-.notice-body dl{display:grid;gap:12px}
-.notice-body dt{font:500 12px "Geist Mono","Geist Mono Fallback",ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--blue-mid)}
-.notice-body dd{margin:4px 0 0;font-size:14px;line-height:1.6}
 .btn[disabled]{opacity:.6;cursor:progress}
 
 /* — Confirmation — */

@@ -62,7 +62,7 @@
             <p class="lead">Déposez votre constat et votre proposition en quinze minutes, depuis une province, une ville ou la diaspora. Par écrit, par note vocale ou par document.</p>
             <div class="hero-actions">
               <a class="btn btn-primary" href="/participer">Déposer une contribution <span class="arw" aria-hidden="true">→</span></a>
-              <a class="link" href="#participation">Voir comment ça se passe</a>
+              <button class="link" type="button" id="open-apercu">Voir comment ça se passe</button>
             </div>
             <p class="hero-note"><b>Gratuit et sans démarche administrative.</b> Aucun paiement n'est demandé. Chaque dépôt reçoit une référence de suivi, par exemple DIALOGUE-2026-000418.</p>
           </div>
@@ -280,6 +280,23 @@
           </div>
         </div>
       </section>
+      <dialog id="apercu" class="notice-modal" aria-labelledby="apercu-title">
+        <div class="notice-head">
+          <h2 id="apercu-title">Comment se passe un dépôt</h2>
+          <button type="button" class="btn-sm quiet" id="close-apercu">Fermer</button>
+        </div>
+        <div class="notice-body">
+          <p>Aucun compte à créer, aucune pièce officielle à fournir. Le formulaire tient sur une page et prend une quinzaine de minutes.</p>
+          <ol class="modal-steps">
+            <li><b>Étape 01</b><div><h3>Identifiez-vous</h3><p>Nom, adresse électronique et lieu de résidence, en RDC ou à l'étranger.</p></div></li>
+            <li><b>Étape 02</b><div><h3>Choisissez la thématique</h3><p>Quinze sujets sont ouverts. Ajoutez un titre si vous le souhaitez.</p></div></li>
+            <li><b>Étape 03</b><div><h3>Exprimez votre proposition</h3><p>Écrivez, enregistrez une note vocale de dix minutes au maximum ou joignez un document. Un seul format suffit.</p></div></li>
+            <li><b>Étape 04</b><div><h3>Conservez votre référence</h3><p>Elle s'affiche dès l'envoi et identifie votre dépôt pendant tout le traitement.</p></div></li>
+          </ol>
+          <p>Votre contribution est ensuite vérifiée, classée par thématique et par province, puis synthétisée pour les travaux du Dialogue national.</p>
+          <p class="modal-foot"><a class="btn btn-primary" href="/participer">Déposer une contribution <span class="arw" aria-hidden="true">→</span></a> <a class="link" href="#parcours" data-close-apercu>Voir le parcours complet</a></p>
+        </div>
+      </dialog>
     </main>
 
     <footer class="site-footer">

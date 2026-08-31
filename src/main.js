@@ -44,6 +44,13 @@ if (statement) {
   wordObserver.observe(statement);
 }
 
+/* Aperçu du parcours en modale — la page d'accueil n'est pas quittée. */
+const apercu = document.querySelector('#apercu');
+document.querySelector('#open-apercu')?.addEventListener('click', () => apercu.showModal());
+document.querySelector('#close-apercu')?.addEventListener('click', () => apercu.close());
+apercu?.addEventListener('click', event => { if (event.target === apercu) apercu.close(); });
+apercu?.querySelector('[data-close-apercu]')?.addEventListener('click', () => apercu.close());
+
 /* Repérage de la section courante dans la navigation. */
 const links = [...document.querySelectorAll('.main-nav a[href^="#"]')];
 const sections = links.map(link => document.querySelector(link.getAttribute('href'))).filter(Boolean);
