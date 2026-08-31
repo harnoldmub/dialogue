@@ -51,7 +51,7 @@ ul,ol{margin:0;padding:0;list-style:none}
 .btn-ghost-light:hover{background:rgba(255,255,255,.12);border-color:#fff;transform:translateY(-1px)}
 .btn-close{display:inline-grid;place-items:center;width:36px;height:36px;padding:0;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--muted);font-size:18px;line-height:1;cursor:pointer;transition:background .25s var(--ease),color .25s var(--ease),border-color .25s var(--ease)}
 .btn-close:hover{background:var(--pale);border-color:var(--blue-mid);color:var(--ink)}
-.link{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:600;color:var(--link);border-bottom:1px solid currentColor;padding-bottom:2px;transition:opacity .25s var(--ease)}
+.link{display:inline-flex;align-items:center;gap:8px;padding:0 0 2px;border:0;border-bottom:1px solid currentColor;border-radius:0;background:none;font-family:inherit;font-size:14px;font-weight:600;line-height:20px;color:var(--link);cursor:pointer;transition:opacity .25s var(--ease)}
 .link:hover{opacity:.7}
 .link.on-navy{color:#fff;border-color:rgba(255,255,255,.5)}
 
