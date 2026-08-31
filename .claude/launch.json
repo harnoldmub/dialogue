@@ -1,0 +1,6 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    { "name": "dialogue", "runtimeExecutable": "npm", "runtimeArgs": ["run", "start"], "port": 5190, "env": { "PORT": "5190" } }
+  ]
+}

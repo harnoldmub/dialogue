@@ -3,63 +3,318 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="CONGO DIALOGUE — plateforme nationale de participation citoyenne au Dialogue national." />
-    <meta name="theme-color" content="#061b42" />
+    <meta name="description" content="Plateforme officielle de participation citoyenne au Dialogue national de la République démocratique du Congo. Déposez votre contribution par écrit, par note vocale ou par document." />
+    <meta name="theme-color" content="#06265c" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <meta property="og:title" content="CONGO DIALOGUE — Une nation, toutes les voix" />
-    <meta property="og:description" content="Participez au Dialogue national et contribuez aux priorités du Congo de demain." />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Congo Dialogue — participation citoyenne au Dialogue national" />
+    <meta property="og:description" content="Déposez votre contribution au Dialogue national : par écrit, par note vocale ou par document." />
     <meta property="og:image" content="/assets/hero.jpg" />
-    <title>CONGO DIALOGUE — Une nation, toutes les voix</title>
-    <link rel="preload" as="image" href="/assets/hero.jpg" />
+    <title>Congo Dialogue — participation citoyenne au Dialogue national</title>
+    <link rel="preload" as="image" href="/assets/hero.jpg" fetchpriority="high" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,600&display=swap" rel="stylesheet" />
-    <script type="application/ld+json">{"@context":"https://schema.org","@type":"GovernmentOrganization","name":"CONGO DIALOGUE","description":"Plateforme nationale de participation au Dialogue national de la République démocratique du Congo."}</script>
+    <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"GovernmentOrganization","name":"Congo Dialogue","description":"Plateforme de participation citoyenne au Dialogue national de la République démocratique du Congo.","areaServed":"CD"}</script>
   </head>
   <body>
     <a class="skip" href="#contenu">Aller au contenu</a>
-    <header class="site-header" id="top">
-      <a class="brand" href="#top" aria-label="CONGO DIALOGUE, accueil"><span class="brand-mark">✦</span> CONGO<br /><em>DIALOGUE</em></a>
-      <button class="menu-toggle" aria-expanded="false" aria-controls="nav">Menu <span></span></button>
-      <nav id="nav" aria-label="Navigation principale"><a href="#dialogue">Le Dialogue</a><a href="#voix">Les voix</a><a href="#actualites">Actualités</a></nav>
-      <a class="header-cta" href="#participer">Participer <span>↗</span></a>
+
+    <div class="flag-stripe" aria-hidden="true"><i></i><b></b><em></em></div>
+    <div class="state-band">
+      <div class="wrap">
+        <p>République démocratique du Congo</p>
+        <p class="devise"><b>Justice</b> · Paix · Travail</p>
+      </div>
+    </div>
+
+    <header class="site-header">
+      <div class="wrap header-inner">
+        <a class="brand" href="/" aria-label="Congo Dialogue, accueil">          <span class="brand-text">Dialogue national<strong>Congo Dialogue</strong></span>
+        </a>
+        <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="nav">Menu <i aria-hidden="true"></i></button>
+        <nav class="main-nav" id="nav" aria-label="Navigation principale">
+          <a href="#dialogue">Le Dialogue</a>
+          <a href="#thematiques">Thématiques</a>
+          <a href="#participation">Participer</a>
+          <a href="#questions">Questions</a>
+          <a href="#documents">Documents</a>
+        </nav>
+        <a class="btn btn-primary header-action" href="/participer">Déposer une contribution</a>
+      </div>
     </header>
-    <div class="national-stripe" aria-label="Couleurs nationales : bleu, jaune et rouge"><i></i><b></b><em></em></div>
 
     <main id="contenu">
-      <section class="hero" aria-labelledby="hero-title">
-        <img src="/assets/hero.jpg" alt="Paysage représentatif de la République démocratique du Congo" fetchpriority="high" />
-        <div class="hero-shade"></div><div class="hero-grid"></div>
-        <div class="hero-copy reveal">
-          <h1 id="hero-title">Un Congo.<br /><em>Des millions</em> de voix.</h1>
-          <p class="hero-intro">Une plateforme pour écouter, relier et construire ensemble les priorités du Congo de demain.</p>
-          <div class="actions"><a class="button gold" href="#participer">Participer au Dialogue <span>↗</span></a><a class="text-link light" href="#processus">Découvrir le processus <span>↓</span></a></div>
+      <section class="hero">
+        <img src="/assets/hero.jpg" alt="Le Chef de l'État salue la population lors d'un déplacement officiel, entouré de la délégation et des habitants venus l'accueillir." width="1080" height="720" fetchpriority="high" />
+        <div class="hero-scrim" aria-hidden="true"></div>
+        <div class="wrap hero-inner">
+          <h1>Le Congo<br />vous écoute.</h1>
+          <a class="hero-cue" href="#presentation">Le Dialogue national <span aria-hidden="true">↓</span></a>
         </div>
-        <a class="scroll-cue" href="#dialogue">Défiler <span></span></a>
+        <p class="hero-credit">Photographie : Présidence de la République</p>
       </section>
 
-      <section class="intro section" id="dialogue">
-        <div class="section-label reveal"><span>01</span> Le Dialogue national</div>
-        <div class="intro-layout">
-          <div class="intro-title reveal"><p class="eyebrow">Notre conviction</p><h2>Un dialogue<br />qui <em>commence</em><br />par vous.</h2></div>
-          <div class="intro-text reveal"><p>Le Dialogue national repose sur une conviction simple&nbsp;: les solutions durables doivent aussi venir des Congolaises et des Congolais eux-mêmes.</p><p>Dans chaque territoire, chaque quartier et au-delà des frontières, une expérience peut éclairer l’avenir commun.</p><a class="text-link" href="#processus">Comprendre la démarche <span>→</span></a></div>
+      <section class="section" id="presentation">
+        <div class="wrap presentation">
+          <h2>Un dialogue national ouvert à chaque Congolaise et chaque Congolais.</h2>
+          <div class="presentation-body">
+            <p class="lead">Déposez votre constat et votre proposition en quinze minutes, depuis une province, une ville ou la diaspora. Par écrit, par note vocale ou par document.</p>
+            <div class="hero-actions">
+              <a class="btn btn-primary" href="/participer">Déposer une contribution <span class="arw" aria-hidden="true">→</span></a>
+              <a class="link" href="#participation">Voir comment ça se passe</a>
+            </div>
+            <p class="hero-note"><b>Gratuit et sans démarche administrative.</b> Aucun paiement n'est demandé. Chaque dépôt reçoit une référence de suivi, par exemple DIALOGUE-2026-000418.</p>
+          </div>
         </div>
-        <div class="facts reveal" aria-label="Repères du Dialogue"><div><strong>26</strong><span>Provinces</span></div><div><strong>145</strong><span>Territoires</span></div><div><strong>+100</strong><span>Pays de diaspora</span></div><div><strong>1</strong><span>Nation</span></div></div>
       </section>
 
-      <section class="process section pale" id="processus"><div class="section-label"><span>03</span> Comment participer</div><div class="process-title reveal"><h2>Une contribution.<br /><em>Un chemin clair.</em></h2><p>Votre parole suit un parcours simple, lisible et sécurisé.</p></div><ol class="steps reveal"><li><span>01</span><h3>Identifiez-vous</h3><p>Province ou pays de résidence.</p></li><li><span>02</span><h3>Choisissez un thème</h3><p>Sélectionnez le sujet auquel contribuer.</p></li><li><span>03</span><h3>Exprimez votre proposition</h3><p>Partagez le constat et la solution.</p></li><li><span>04</span><h3>Rejoignez le Dialogue</h3><p>Votre contribution entre dans la consultation.</p></li></ol></section>
+      <section class="section tight" aria-label="Repères du Dialogue national">
+        <div class="wrap">
+          <ul class="figures reveal">
+            <li><strong>26</strong><span>provinces consultées</span></li>
+            <li><strong>145</strong><span>territoires et 33 villes</span></li>
+            <li><strong>15</strong><span>thématiques de travail</span></li>
+            <li><strong>3</strong><span>formats de contribution</span></li>
+          </ul>
+        </div>
+      </section>
 
-      <section class="themes section"><div class="section-label"><span>04</span> Grandes thématiques</div><div class="themes-head reveal"><h2>Ce qui compte.<br /><em>Ce qui rassemble.</em></h2><p>Les priorités du Dialogue sont multiples. Elles se rencontrent dans une même ambition nationale.</p></div><div class="theme-list reveal"><a href="#participer"><b>01</b><span>Paix & sécurité</span><em>La confiance comme fondation</em><i>↗</i></a><a href="#participer"><b>02</b><span>Institutions & gouvernance</span><em>Une République plus proche</em><i>↗</i></a><a href="#participer"><b>03</b><span>Économie & emploi</span><em>Créer et partager la prospérité</em><i>↗</i></a><a href="#participer"><b>04</b><span>Éducation & jeunesse</span><em>Donner sa chance à chaque avenir</em><i>↗</i></a><a href="#participer"><b>05</b><span>Territoires & environnement</span><em>Valoriser les ressources, protéger demain</em><i>↗</i></a></div></section>
+      <section class="section" id="dialogue">
+        <div class="wrap">
+          <div class="section-head reveal">
+            <div>
+              <p class="eyebrow"><b>01</b> Le Dialogue national</p>
+              <h2>Une consultation qui commence par la parole des citoyens.</h2>
+            </div>
+            <p>Les travaux du Dialogue national reposent sur un principe simple : les décisions qui engagent le pays gagnent à être éclairées par celles et ceux qui les vivent.</p>
+          </div>
+          <div class="editorial">
+            <div class="editorial-body reveal">
+              <p>Cette plateforme recueille les contributions citoyennes destinées aux travaux du Dialogue national. Elle s'adresse à toute personne concernée par l'avenir du pays : habitants des provinces, société civile, confessions religieuses, autorités coutumières, entreprises, universités, jeunesse et diaspora.</p>
+              <p>Une contribution utile décrit trois choses : ce que vous observez sur le terrain, ce que vous proposez, et ce que cela changerait concrètement. Elle peut tenir en quelques lignes, en une note vocale de deux minutes ou en un mémorandum de plusieurs pages.</p>
+              <p>Les contributions ne sont pas publiées automatiquement. Elles sont vérifiées, classées par thématique, puis synthétisées pour alimenter les travaux. Les extraits rendus publics le sont sous forme anonymisée.</p>
+            </div>
+            <aside class="aside-note reveal">
+              <h3>Ce que vous devez savoir avant de déposer</h3>
+              <p>Le dépôt est individuel ou collectif. Une organisation peut déposer au nom de ses membres en le précisant dans le titre de la proposition.</p>
+              <dl>
+                <div><dt>Durée</dt><dd>Environ 15 minutes</dd></div>
+                <div><dt>Formats acceptés</dt><dd>Texte, note vocale (10 min), PDF, DOC, DOCX, TXT, JPG, PNG</dd></div>
+                <div><dt>Langues</dt><dd>Français, lingala, swahili, kikongo, tshiluba</dd></div>
+                <div><dt>Preuve de dépôt</dt><dd>Référence unique remise à l'écran</dd></div>
+              </dl>
+            </aside>
+          </div>
+        </div>
+      </section>
 
-      <section class="voices section dark" id="voix"><div class="section-label"><span>05</span> Les voix du Congo</div><div class="voices-head reveal"><h2>Des idées qui<br /><em>font avancer.</em></h2><p>Extraits anonymisés — données de démonstration.</p></div><div class="quotes reveal"><figure><blockquote>«&nbsp;Faciliter l’accès des jeunes entrepreneurs aux marchés publics et au financement.&nbsp;»</blockquote><figcaption><span>Kinshasa</span> Économie & emploi</figcaption></figure><figure><blockquote>«&nbsp;La diaspora doit pouvoir contribuer davantage au transfert de compétences vers les institutions et entreprises congolaises.&nbsp;»</blockquote><figcaption><span>Belgique</span> Diaspora</figcaption></figure></div></section>
+      <section class="statement" aria-label="Notre conviction">
+        <div class="wrap">
+          <p data-statement>Une contribution déposée depuis un territoire éloigné pèse autant qu'une note remise dans une salle de conférence. C'est la condition d'un pacte national qui tient.</p>
+        </div>
+      </section>
 
-      <section class="participate section" id="participer"><div class="section-label"><span>06</span> Déposer une contribution</div><div class="contrib-intro reveal"><p class="eyebrow">Votre participation</p><h2>Votre voix<br /><em>compte.</em></h2><p>Partagez ce que vous observez, ce que vous proposez et l’impact que vous espérez. Vous pouvez enregistrer votre brouillon à tout moment.</p></div><form class="contribution-form reveal"><div class="form-progress"><span class="active">1. Localisation</span><span>2. Profil</span><span>3. Thématique</span><span>4. Proposition</span></div><div class="form-grid"><label>Vous participez depuis<select required><option value="">Choisir une option</option><option>La RDC</option><option>La diaspora</option></select></label><label>Votre province ou pays<input type="text" placeholder="Ex. Kasaï-Central ou Belgique" required /></label><label class="full">Thématique<select required><option value="">Sélectionner une thématique</option><option>Paix & sécurité</option><option>Économie & emploi</option><option>Éducation & jeunesse</option><option>Diaspora</option></select></label><label class="full">Votre proposition<textarea rows="4" placeholder="Décrivez le problème constaté et votre proposition…" required></textarea></label></div><label class="consent"><input type="checkbox" required /> <span>J’accepte que ma contribution soit traitée dans le cadre du Dialogue national.</span></label><button class="button gold" type="submit">Continuer ma contribution <span>→</span></button><p class="form-note">Architecture prête pour sauvegarde de brouillon et connexion API.</p></form></section>
+      <section class="section pale" id="thematiques">
+        <div class="wrap">
+          <div class="section-head reveal">
+            <div>
+              <p class="eyebrow"><b>02</b> Thématiques</p>
+              <h2>Quinze sujets ouverts à la contribution.</h2>
+            </div>
+            <p>Choisissez la thématique la plus proche de votre proposition. Si vous hésitez entre deux sujets, déposez une contribution par sujet.</p>
+          </div>
+          <ul class="themes reveal">
+            <li><b>01</b><h3>Paix et sécurité</h3><p>Protection des populations, retour des déplacés, réforme des forces de sécurité.</p></li>
+            <li><b>02</b><h3>Justice</h3><p>Accès au juge, lutte contre l'impunité, exécution des décisions.</p></li>
+            <li><b>03</b><h3>Gouvernance</h3><p>Transparence des finances publiques, qualité du service public, redevabilité.</p></li>
+            <li><b>04</b><h3>Économie et emploi</h3><p>Entrepreneuriat, accès au financement, formalisation des activités.</p></li>
+            <li><b>05</b><h3>Jeunesse</h3><p>Insertion professionnelle, participation à la vie publique, formation technique.</p></li>
+            <li><b>06</b><h3>Éducation</h3><p>Conditions d'enseignement, gratuité effective, contenus et filières.</p></li>
+            <li><b>07</b><h3>Santé</h3><p>Couverture des soins, disponibilité des médicaments, santé maternelle.</p></li>
+            <li><b>08</b><h3>Femmes</h3><p>Protection contre les violences, accès aux responsabilités, autonomie économique.</p></li>
+            <li><b>09</b><h3>Diaspora</h3><p>Transfert de compétences, investissement, relations avec les services consulaires.</p></li>
+            <li><b>10</b><h3>Cohésion nationale</h3><p>Vivre ensemble, réconciliation, mémoire des conflits.</p></li>
+            <li><b>11</b><h3>Décentralisation</h3><p>Moyens des provinces et des entités territoriales, proximité des services.</p></li>
+            <li><b>12</b><h3>Culture</h3><p>Patrimoine, industries créatives, langues nationales.</p></li>
+            <li><b>13</b><h3>Numérique et innovation</h3><p>Connectivité, administration en ligne, protection des données.</p></li>
+            <li><b>14</b><h3>Environnement</h3><p>Forêts et tourbières, eau, agriculture et gestion des ressources.</p></li>
+            <li><b>15</b><h3>Autre sujet</h3><p>Une proposition qui n'entre dans aucune des catégories précédentes.</p></li>
+          </ul>
+          <p class="themes-foot"><a class="link" href="/participer">Choisir une thématique et déposer</a> <span>Une contribution par thématique, sans limite de nombre.</span></p>
+        </div>
+      </section>
 
-      <section class="transparency section pale"><div class="section-label"><span>07</span> Transparence</div><div class="transparency-head reveal"><h2>Du citoyen au<br /><em>Pacte national.</em></h2><p>Chaque contribution est pensée pour avoir une suite visible dans le processus collectif.</p></div><div class="journey reveal"><span>Contribution</span><i>→</i><span>Analyse</span><i>→</i><span>Regroupement</span><i>→</i><span>Consultation</span><i>→</i><span>Synthèse</span><i>→</i><span>Assises nationales</span><i>→</i><strong>Pacte national</strong></div></section>
+      <section class="section" id="participation">
+        <div class="wrap">
+          <div class="section-head reveal">
+            <div>
+              <p class="eyebrow"><b>03</b> Comment participer</p>
+              <h2>Quatre étapes, aucune inscription préalable.</h2>
+            </div>
+            <p>Vous n'avez pas besoin de créer un compte. Le formulaire tient sur une page et se termine par la remise d'une référence de suivi.</p>
+          </div>
+          <ol class="steps reveal">
+            <li><span>Étape 01</span><h3>Identifiez-vous</h3><p>Nom, adresse électronique et lieu de résidence, en RDC ou à l'étranger.</p></li>
+            <li><span>Étape 02</span><h3>Choisissez la thématique</h3><p>Quinze sujets sont ouverts. Ajoutez un titre si vous le souhaitez.</p></li>
+            <li><span>Étape 03</span><h3>Exprimez votre proposition</h3><p>Écrivez, enregistrez une note vocale ou joignez un document. Les trois sont possibles.</p></li>
+            <li><span>Étape 04</span><h3>Conservez votre référence</h3><p>Elle vous est remise dès l'envoi et identifie votre dépôt dans le traitement.</p></li>
+          </ol>
+        </div>
+      </section>
 
-      <section class="news section" id="actualites"><div class="section-label"><span>08</span> Informations officielles</div><div class="news-head reveal"><h2>Suivre le<br /><em>Dialogue.</em></h2><a class="text-link" href="#documents">Voir tous les documents <span>→</span></a></div><div class="news-grid reveal"><article class="lead-news"><p>Annonce officielle <span>•</span> À la une</p><h3>Le Dialogue national ouvre un espace de parole pour tous les Congolais</h3><a href="#documents">Lire la déclaration <span>→</span></a></article><article><p>Calendrier <span>•</span> À venir</p><h3>Les grandes étapes de la consultation nationale</h3><a href="#documents">Consulter <span>→</span></a></article><article><p>Documentation <span>•</span> 01.08.2026</p><h3>Allocution du Chef de l’État — ouverture du Dialogue</h3><a href="/assets/Allocution%20du%20Chef%20de%20l'Etat%20-%20Annonce%20de%20l'ouverture%20du%20dialogue%20national.pdf" target="_blank">Consulter <span>↗</span></a></article></div></section>
+      <section class="section pale" id="parcours">
+        <div class="wrap">
+          <div class="section-head reveal">
+            <div>
+              <p class="eyebrow"><b>04</b> Traitement</p>
+              <h2>Ce qui arrive à votre contribution.</h2>
+            </div>
+            <p>Chaque dépôt suit le même parcours, quel que soit son format et son lieu d'origine.</p>
+          </div>
+          <ol class="journey reveal">
+            <li><b>Étape 01</b><h3>Réception</h3><p>Le dépôt est horodaté et reçoit une référence unique.</p></li>
+            <li><b>Étape 02</b><h3>Recevabilité</h3><p>Vérification du contenu et retrait des envois hors sujet ou injurieux.</p></li>
+            <li><b>Étape 03</b><h3>Analyse thématique</h3><p>Classement par thématique et par province, transcription des notes vocales.</p></li>
+            <li><b>Étape 04</b><h3>Synthèse provinciale</h3><p>Regroupement des propositions convergentes en une note par province.</p></li>
+            <li><b>Étape 05</b><h3>Travaux du Dialogue</h3><p>Les synthèses sont versées aux commissions thématiques.</p></li>
+            <li><b>Étape 06</b><h3>Pacte national</h3><p>Les engagements retenus sont publiés et rendus opposables au suivi.</p></li>
+          </ol>
+        </div>
+      </section>
+
+      <section class="section" id="questions">
+        <div class="wrap faq">
+          <div class="reveal">
+            <p class="eyebrow"><b>05</b> Questions fréquentes</p>
+            <h2>Vos questions avant de contribuer.</h2>
+            <p class="faq-note">Une question qui ne figure pas ici ? Déposez-la comme contribution : les demandes de précision sont relevées avec le reste.</p>
+          </div>
+          <div class="faq-list reveal">
+            <details>
+              <summary>Qui peut déposer une contribution ?</summary>
+              <p>Toute personne de nationalité congolaise ou résidant en République démocratique du Congo, ainsi que les membres de la diaspora. Les associations, entreprises, établissements d'enseignement et confessions religieuses peuvent déposer au nom de leurs membres.</p>
+            </details>
+            <details>
+              <summary>Ma contribution sera-t-elle publiée avec mon nom ?</summary>
+              <p>Non. Les contributions ne sont pas publiées automatiquement. Lorsqu'un extrait est repris dans une synthèse, il est anonymisé. Votre nom n'est associé publiquement à votre proposition qu'avec votre accord écrit.</p>
+            </details>
+            <details>
+              <summary>Je n'ai pas l'habitude d'écrire. Puis-je quand même participer ?</summary>
+              <p>Oui. Vous pouvez enregistrer une note vocale de dix minutes au maximum directement depuis le formulaire, dans la langue de votre choix, ou envoyer une photographie d'un texte manuscrit au format JPG ou PNG.</p>
+            </details>
+            <details>
+              <summary>Combien de contributions puis-je déposer ?</summary>
+              <p>Autant que nécessaire. Nous recommandons une contribution par thématique : une proposition ciblée est plus facile à analyser qu'un envoi qui aborde plusieurs sujets à la fois.</p>
+            </details>
+            <details>
+              <summary>Que deviennent mes données personnelles ?</summary>
+              <p>Vos coordonnées servent uniquement au traitement de votre contribution et à un éventuel besoin de précision. Elles ne sont ni revendues ni transmises à des tiers à des fins commerciales, et sont conservées jusqu'à la clôture des travaux du Dialogue national.</p>
+            </details>
+            <details>
+              <summary>Comment savoir si mon dépôt a bien été enregistré ?</summary>
+              <p>Une référence au format DIALOGUE-2026-000418 s'affiche à l'écran dès que votre contribution est enregistrée. Conservez-la : elle identifie votre dépôt en cas de question ultérieure.</p>
+            </details>
+            <details>
+              <summary>La participation est-elle payante ?</summary>
+              <p>Non. Le dépôt est entièrement gratuit. Aucun agent n'est habilité à demander un paiement, une contrepartie ou un document officiel pour vous permettre de contribuer.</p>
+            </details>
+            <details>
+              <summary>Ma connexion est lente. Le formulaire fonctionne-t-il quand même ?</summary>
+              <p>Oui. La page reste légère et le texte seul suffit à valider un dépôt. Les fichiers joints sont limités à 10 Mo chacun afin de rester accessibles depuis une connexion mobile.</p>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      <section class="section pale" id="documents">
+        <div class="wrap">
+          <div class="section-head reveal">
+            <div>
+              <p class="eyebrow"><b>06</b> Documents et repères</p>
+              <h2>Les références du Dialogue national.</h2>
+            </div>
+            <p>Les documents officiels publiés à ce jour et les repères utiles pour préparer une contribution.</p>
+          </div>
+          <ul class="docs reveal">
+            <li>
+              <a href="/assets/allocution-ouverture-dialogue-national.pdf" target="_blank" rel="noopener">
+                <span class="meta">01.08.2026</span>
+                <h3>Allocution du Chef de l'État annonçant l'ouverture du Dialogue national</h3>
+                <span class="kind">PDF · 4,1 Mo ↗</span>
+              </a>
+            </li>
+            <li>
+              <a href="#thematiques">
+                <span class="meta">Référentiel</span>
+                <h3>Les quinze thématiques ouvertes à la contribution</h3>
+                <span class="kind">Sur cette page →</span>
+              </a>
+            </li>
+            <li>
+              <a href="#parcours">
+                <span class="meta">Procédure</span>
+                <h3>Parcours d'une contribution, de la réception au pacte national</h3>
+                <span class="kind">Sur cette page →</span>
+              </a>
+            </li>
+            <li>
+              <a href="/mentions">
+                <span class="meta">Cadre légal</span>
+                <h3>Mentions légales, traitement des données et accessibilité</h3>
+                <span class="kind">Page dédiée →</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="section navy">
+        <div class="wrap closing">
+          <div>            <h2>Votre proposition peut entrer dans les travaux.</h2>
+            <p>Quinze minutes suffisent. Vous pouvez écrire, parler ou joindre un document déjà rédigé.</p>
+          </div>
+          <div class="closing-actions">
+            <a class="btn btn-ghost-light" href="/participer">Déposer une contribution <span class="arw" aria-hidden="true">→</span></a>
+            <a class="link on-navy" href="#questions">Lire les questions fréquentes</a>
+          </div>
+        </div>
+      </section>
     </main>
-    <footer id="documents"><div class="footer-stripe" aria-label="Couleurs nationales : bleu, jaune et rouge"><i></i><b></b><em></em></div><div><p class="eyebrow light">République démocratique du Congo</p><h2>Construisons ensemble<br />le Congo de <em>demain.</em></h2><a class="button gold" href="#participer">Participer au Dialogue <span>↗</span></a></div><div class="footer-links"><a href="#dialogue">Dialogue national</a><a href="#participer">Participer</a><a href="#actualites">Actualités</a><a href="#processus">Transparence</a></div><small>© 2026 CONGO DIALOGUE · Plateforme institutionnelle de participation · Mentions légales · Accessibilité</small></footer>
+
+    <footer class="site-footer">
+      <div class="wrap footer-grid">
+        <div>
+          <span class="brand">            <span class="brand-text">Dialogue national<strong>Congo Dialogue</strong></span>
+          </span>
+          <p class="about">Plateforme de recueil des contributions citoyennes destinées aux travaux du Dialogue national de la République démocratique du Congo.</p>
+        </div>
+        <div>
+          <h3>Participer</h3>
+          <ul>
+            <li><a href="/participer">Déposer une contribution</a></li>
+            <li><a href="#thematiques">Thématiques</a></li>
+            <li><a href="#participation">Étapes du dépôt</a></li>
+            <li><a href="#questions">Questions fréquentes</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3>Informations</h3>
+          <ul>
+            <li><a href="#documents">Documents officiels</a></li>
+            <li><a href="#parcours">Traitement des contributions</a></li>
+            <li><a href="/mentions">Mentions légales</a></li>
+            <li><a href="/mentions#donnees">Données personnelles</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="wrap footer-bottom">
+        <span>© 2026 Congo Dialogue · République démocratique du Congo</span>
+        <span><a href="/mentions#accessibilite">Accessibilité</a> · Le dépôt de contribution est gratuit</span>
+      </div>
+      <div class="flag-stripe" aria-hidden="true"><i></i><b></b><em></em></div>
+    </footer>
+
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>

@@ -1,6 +1,17 @@
-/* Bande institutionnelle — signature bleu, jaune, rouge de la RDC. */
-footer{position:relative}
-.national-stripe{z-index:11;position:absolute;top:0;left:0;right:0;height:7px;display:grid;grid-template-columns:repeat(3,1fr)}.national-stripe>*{display:block}.national-stripe i{background:#007fff}.national-stripe b{background:#f7d23e}.national-stripe em{background:#d11930}
-.institutional-band{min-height:82px;background:#fff;display:grid;grid-template-columns:1fr minmax(240px,40%);align-items:stretch;border-bottom:1px solid rgba(16,33,62,.16)}.institutional-copy{padding:21px 8vw;display:flex;align-items:center;gap:28px}.institutional-copy span{font:10px "DM Mono",monospace;letter-spacing:.11em;text-transform:uppercase;color:#476078}.institutional-copy strong{font:600 14px "DM Sans",sans-serif;letter-spacing:.01em}.institutional-copy strong i{color:#d11930;font-style:normal;margin:0 8px}.institutional-colors{display:grid;grid-template-columns:57% 28% 15%;min-height:100%}.institutional-colors>*{display:block}.institutional-colors i{background:#007fff}.institutional-colors b{background:#f7d23e}.institutional-colors em{background:#d11930}
-.footer-stripe{position:absolute;top:0;left:0;right:0;display:grid;grid-template-columns:repeat(3,1fr);height:5px}.footer-stripe>*{display:block}.footer-stripe i{background:#007fff}.footer-stripe b{background:#f7d23e}.footer-stripe em{background:#d11930}
-@media(max-width:760px){.national-stripe{height:5px}.institutional-band{grid-template-columns:1fr;min-height:0}.institutional-copy{padding:16px 7vw;display:block}.institutional-copy span{display:block;margin-bottom:8px;font-size:9px}.institutional-copy strong{font-size:12px}.institutional-colors{height:8px}}
+/* Signature institutionnelle — bandeau République et filet bleu, jaune, rouge. */
+.flag-stripe{display:grid;grid-template-columns:repeat(3,1fr);height:4px}
+.flag-stripe>*{display:block}
+.flag-stripe i{background:#007fff}
+.flag-stripe b{background:var(--gold)}
+.flag-stripe em{background:var(--red)}
+
+.state-band{background:var(--blue);color:#fff}
+.state-band .wrap{display:flex;flex-wrap:wrap;align-items:center;gap:8px 24px;min-height:36px;padding-top:8px;padding-bottom:8px}
+.state-band p{font:500 11px/1.4 "Geist Mono","Geist Mono Fallback",ui-monospace,monospace;letter-spacing:.09em;text-transform:uppercase;color:#c3d2e8}
+.state-band .devise{margin-left:auto;color:#8fa8ce}
+.state-band .devise b{color:var(--gold);font-weight:500}
+
+@media(max-width:760px){
+  .state-band p{font-size:10px;letter-spacing:.06em}
+  .state-band .devise{display:none}
+}

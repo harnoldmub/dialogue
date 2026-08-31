@@ -1,2 +1,112 @@
-@import './identity.css';
-:root{--navy:#061b42;--blue:#0b3f96;--ink:#10213e;--cream:#f7f4ed;--gold:#f5c84c;--red:#d11930;--line:rgba(16,33,62,.18)}*{box-sizing:border-box}body{margin:0;color:var(--ink);background:var(--cream);font-family:"DM Sans",sans-serif}.participation-header{height:105px;padding:25px 7vw;display:flex;align-items:center;justify-content:space-between;background:var(--navy);color:#fff}.back-link{font-size:13px;font-weight:600;color:inherit;text-decoration:none;border-bottom:1px solid currentColor;padding-bottom:5px}.participation-header .back-link{color:#d4e2f6}.participation-page main{max-width:1120px;margin:auto;padding:80px 7vw 120px}.participation-intro{max-width:740px;margin-bottom:64px}.eyebrow{font:500 11px "DM Mono",monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--blue)}h1,h2,legend{font-family:"Playfair Display",serif;letter-spacing:-.05em}h1{font-size:clamp(54px,7vw,96px);line-height:.95;margin:13px 0 24px}h1 em,h2 em{font-weight:500}.participation-intro>p:not(.eyebrow){max-width:580px;font-size:18px;line-height:1.6}.methods{display:flex;gap:19px;margin-top:28px;font:11px "DM Mono",monospace;color:var(--blue)}.contribution-page-form{background:#fff;padding:44px clamp(20px,5vw,65px);border-top:5px solid var(--blue)}fieldset{border:0;border-top:1px solid var(--line);margin:0 0 47px;padding:32px 0 0}fieldset:first-child{border-top:0;padding-top:0}legend{font-size:34px;font-weight:600;padding:0 18px 0 0}.fields{display:grid;gap:22px;margin-top:26px}.fields.two{grid-template-columns:1fr 1fr}label,.full-label{display:grid;gap:8px;font-size:13px;font-weight:600}label small{font-weight:400;color:#65718a}input,select,textarea{width:100%;border:1px solid #b8c4d5;border-radius:0;background:white;padding:12px;color:var(--ink);font:400 15px "DM Sans",sans-serif}input:focus,select:focus,textarea:focus{outline:3px solid rgba(11,63,150,.2);border-color:var(--blue)}textarea{resize:vertical;line-height:1.5}.contribution-method{margin-top:42px;padding-top:28px;border-top:1px solid var(--line)}.contribution-method h2{font-size:26px;margin:0 0 10px}.contribution-method>p{font-size:14px;color:#56627a;margin:0 0 18px}.count,.field-help{font:11px "DM Mono",monospace;color:#69758b}.recorder-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.outline-button,.plain-button,.remove-button{padding:12px 15px;border:1px solid var(--blue);background:white;color:var(--blue);font:600 13px "DM Sans",sans-serif;cursor:pointer}.plain-button{border-color:#8da0bd;color:var(--ink)}.remove-button{border-color:var(--red);color:var(--red);margin-top:12px}.recorder audio{width:min(100%,460px);display:block;margin-top:17px}.dropzone{min-height:150px;border:1px dashed #7894c0;display:grid;place-content:center;text-align:center;padding:25px;background:#f4f8fd;color:var(--blue);cursor:pointer}.dropzone span{font-size:12px;color:#62718a;margin-top:8px;line-height:1.5}.dropzone input{position:absolute;width:1px;height:1px;opacity:0}.file-list{padding:0;margin:15px 0 0;list-style:none}.file-list li{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);padding:9px 0;font-size:13px}.file-list button{border:0;background:transparent;color:var(--red);cursor:pointer}.consent-page{display:flex;grid-template-columns:auto 1fr;align-items:start;line-height:1.5;font-weight:400}.consent-page input{width:auto;margin:3px 10px 0 0}.form-error{color:#b4162a;font-size:13px;min-height:20px}.submit-contribution{display:inline-flex;gap:28px;align-items:center;border:0;padding:17px 20px;background:var(--gold);color:var(--navy);font-weight:600;cursor:pointer}.submit-contribution:disabled{opacity:.6;cursor:wait}.confirmation{background:var(--navy);color:#fff;padding:54px;margin-top:40px}.confirmation h2{font-size:clamp(42px,5vw,70px);line-height:.95;margin:13px 0}.confirmation>p:not(.eyebrow){color:#d2def0}.confirmation strong{display:block;color:var(--gold);font:500 24px "DM Mono",monospace;margin:25px 0}.confirmation .back-link{color:#fff}@media(max-width:620px){.participation-header{height:82px;padding:18px 7vw}.participation-header .brand{font-size:10px}.participation-header .brand em{font-size:14px}.back-link{font-size:11px}.participation-page main{padding:57px 6vw 80px}.participation-intro{margin-bottom:43px}.participation-intro>p:not(.eyebrow){font-size:16px}.methods{gap:12px;font-size:10px}.contribution-page-form{padding:28px 18px}.fields.two{grid-template-columns:1fr}.recorder-actions{align-items:stretch}.outline-button,.plain-button{flex:1}.confirmation{padding:31px 24px}}
+/* Page de dépôt — formulaire administratif : une colonne, aide latérale. */
+.page-header{border-bottom:1px solid var(--line)}
+.page-header .wrap{display:flex;align-items:center;gap:24px;min-height:64px}
+.page-header .back{margin-left:auto;font-size:14px;color:var(--link);border-bottom:1px solid currentColor;padding-bottom:2px}
+.breadcrumb{padding:16px 0;font-size:12px;color:var(--muted);font-family:"Geist Mono","Geist Mono Fallback",ui-monospace,monospace;letter-spacing:.06em}
+.breadcrumb a:hover{color:var(--link)}
+.breadcrumb span{margin:0 8px;color:var(--line)}
+
+.form-intro{padding:8px 0 40px;border-bottom:1px solid var(--line-soft)}
+.form-intro h1{font-size:36px;line-height:1.15;max-width:680px}
+.form-intro .lead{margin-top:16px}
+
+.form-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,320px);gap:48px 64px;align-items:start;padding:48px 0 96px}
+.form-aside{position:sticky;top:96px;display:grid;gap:16px}
+.aside-card{border:1px solid var(--line);border-radius:8px;background:var(--pale);padding:24px}
+.aside-card h2{font-size:14px;margin-bottom:12px}
+.aside-card p,.aside-card li{font-size:14px;line-height:1.6;color:var(--muted)}
+.aside-card ul{display:grid;gap:8px;margin-top:8px}
+.aside-card li{padding-left:16px;position:relative}
+.aside-card li::before{content:"";position:absolute;left:0;top:9px;width:8px;height:1px;background:var(--blue-mid)}
+
+/* — Blocs du formulaire — */
+.form-step{border:1px solid var(--line);border-radius:8px;background:#fff;padding:24px;margin:0 0 24px}
+.form-step>legend{padding:0;display:flex;align-items:baseline;gap:12px}
+.form-step>legend b{font:500 12px "Geist Mono","Geist Mono Fallback",ui-monospace,monospace;letter-spacing:.08em;color:var(--blue-mid)}
+.form-step>legend span{font-size:18px;font-weight:600;letter-spacing:-.01em}
+.step-hint{margin:12px 0 24px;font-size:14px;color:var(--muted);max-width:680px}
+.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 24px}
+.fields .full{grid-column:1/-1}
+label.field{display:block;font-size:14px;font-weight:500}
+label.field>input,label.field>select,label.field>textarea{margin-top:8px}
+label.field .hint{margin-left:4px;font-weight:400;color:var(--muted)}
+input[type=text],input[type=email],input[type=tel],select,textarea{width:100%;padding:8px 12px;min-height:40px;border:1px solid var(--line);border-radius:6px;background:#fff;font-size:16px;transition:border-color .25s var(--ease),box-shadow .25s var(--ease)}
+textarea{min-height:180px;line-height:1.6;resize:vertical}
+select{appearance:none;background-image:linear-gradient(45deg,transparent 49%,var(--muted) 50%),linear-gradient(-45deg,transparent 49%,var(--muted) 50%);background-position:calc(100% - 16px) 18px,calc(100% - 11px) 18px;background-size:5px 5px;background-repeat:no-repeat;padding-right:40px}
+input:focus,select:focus,textarea:focus{outline:0;border-color:var(--blue-mid);box-shadow:0 0 0 3px rgba(11,63,150,.14)}
+input[aria-invalid=true],select[aria-invalid=true],textarea[aria-invalid=true]{border-color:var(--red);box-shadow:0 0 0 3px rgba(205,17,38,.12)}
+.field-error{display:block;flex-basis:100%;margin-top:4px;font-size:13px;font-weight:400;color:var(--red)}
+.count{margin-top:8px;font:400 12px "Geist Mono","Geist Mono Fallback",ui-monospace,monospace;color:var(--muted);text-align:right}
+
+/* — Formats de contribution — */
+.method{border-top:1px solid var(--line-soft);padding-top:24px;margin-top:24px}
+.method:first-of-type{border-top:0;padding-top:0;margin-top:0}
+.method h3{font-size:16px;display:flex;align-items:baseline;gap:12px}
+.method h3 b{font:500 12px "Geist Mono","Geist Mono Fallback",ui-monospace,monospace;letter-spacing:.08em;color:var(--blue-mid)}
+.method>p{margin:8px 0 16px;font-size:14px;color:var(--muted);max-width:680px}
+.recorder-actions{display:flex;flex-wrap:wrap;align-items:center;gap:12px}
+.timer{font:500 14px "Geist Mono","Geist Mono Fallback",ui-monospace,monospace;color:var(--muted);font-variant-numeric:tabular-nums}
+.rec-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--red);animation:pulse 1.6s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+audio{width:100%;max-width:420px;margin-top:16px}
+.field-help{margin-top:12px;font-size:13px;color:var(--muted)}
+.field-help.warn{color:var(--red)}
+.btn-sm{padding:8px 12px;font-size:14px;font-weight:600;border:1px solid var(--line);border-radius:6px;background:#fff;cursor:pointer;transition:border-color .25s var(--ease),background .25s var(--ease)}
+.btn-sm:hover{border-color:var(--blue);background:var(--pale)}
+.btn-sm.quiet{border-color:transparent;color:var(--muted);text-decoration:underline;padding-left:4px;padding-right:4px}
+.btn-sm.quiet:hover{color:var(--red);background:none}
+
+.dropzone{position:relative;display:grid;gap:4px;justify-items:start;border:1px dashed var(--line);border-radius:6px;padding:24px;background:var(--pale);cursor:pointer;transition:border-color .25s var(--ease),background .25s var(--ease)}
+.dropzone:hover,.dropzone.over{border-color:var(--blue-mid);background:var(--pale-2)}
+.dropzone strong{font-size:14px}
+.dropzone span{font-size:13px;color:var(--muted)}
+.dropzone input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.file-list{margin-top:12px;display:grid;gap:8px}
+.file-list li{display:flex;align-items:center;gap:16px;justify-content:space-between;border:1px solid var(--line);border-radius:6px;padding:8px 12px;font-size:14px;background:#fff}
+.file-list small{color:var(--muted)}
+
+/* — Consentement et envoi — */
+.consent{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start;border:1px solid var(--line);border-radius:8px;padding:16px;font-size:14px;line-height:1.6;background:#fff}
+.consent input{width:18px;height:18px;margin:2px 0 0;flex:none;accent-color:var(--blue)}
+.form-alert{margin:16px 0 0;border:1px solid var(--red);border-radius:6px;background:#fdf3f4;padding:12px 16px;font-size:14px;color:#8f0f1d}
+.form-alert:empty{display:none}
+.form-submit{display:flex;flex-wrap:wrap;align-items:center;gap:16px 24px;margin-top:24px}
+.form-submit .note{font-size:13px;color:var(--muted)}
+.form-submit .link{background:none;border:0;border-bottom:1px solid currentColor;padding:0 0 2px;cursor:pointer}
+
+/* — Notice de traitement en modale — */
+.notice-modal{width:min(680px,calc(100vw - 32px));max-height:min(80vh,720px);padding:0;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);overflow:auto}
+.notice-modal::backdrop{background:rgba(6,38,92,.55)}
+.notice-head{position:sticky;top:0;display:flex;gap:24px;align-items:baseline;justify-content:space-between;padding:24px;border-bottom:1px solid var(--line);background:#fff}
+.notice-head h2{font-size:18px}
+.notice-body{padding:24px;display:grid;gap:16px}
+.notice-body p{font-size:14px;line-height:1.65;color:var(--muted)}
+.notice-body dl{display:grid;gap:12px}
+.notice-body dt{font:500 12px "Geist Mono","Geist Mono Fallback",ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--blue-mid)}
+.notice-body dd{margin:4px 0 0;font-size:14px;line-height:1.6}
+.btn[disabled]{opacity:.6;cursor:progress}
+
+/* — Confirmation — */
+.confirmation{max-width:680px;padding:48px 0 96px}
+.confirmation h1{font-size:36px;line-height:1.15;margin-bottom:16px}
+.confirmation p{font-size:16px;color:var(--muted);line-height:1.6}
+.reference{display:block;margin:24px 0;border:1px solid var(--line);border-radius:8px;background:var(--pale);padding:24px;font:500 24px "Geist Mono","Geist Mono Fallback",ui-monospace,monospace;letter-spacing:.04em;color:var(--blue)}
+.confirmation-actions{display:flex;flex-wrap:wrap;gap:16px 24px;align-items:center;margin-top:32px}
+
+/* — Page simple (mentions, erreur) — */
+.static-page{max-width:680px;padding:40px 0 96px}
+.static-page h1{font-size:36px;line-height:1.15;margin-bottom:24px}
+.static-page h2{font-size:20px;margin:40px 0 12px}
+.static-page p,.static-page li{font-size:16px;line-height:1.7;color:#243352;margin-bottom:12px}
+.static-page ul{list-style:disc;padding-left:20px}
+
+@media(max-width:1000px){
+  .form-layout{grid-template-columns:1fr;padding-bottom:64px}
+  .form-aside{position:static;order:-1}
+}
+@media(max-width:760px){
+  .form-intro h1,.confirmation h1,.static-page h1{font-size:30px}
+  .fields{grid-template-columns:1fr}
+  .form-step{padding:16px}
+  .reference{font-size:20px}
+}

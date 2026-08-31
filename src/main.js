@@ -1,27 +1,60 @@
 import './style.css';
 import './identity.css';
 
-// The existing CTAs retain their visual treatment while opening the dedicated flow.
-document.querySelectorAll('a[href="#participer"]').forEach(link => link.addEventListener('click', event => {
-  event.preventDefault(); window.location.href = '/participer';
-}));
+document.documentElement.classList.add('js');
 
+/* Navigation mobile — la barre reste visible, seul le panneau se déplie. */
 const menu = document.querySelector('.menu-toggle');
-const nav = document.querySelector('nav');
+const nav = document.querySelector('.main-nav');
 menu?.addEventListener('click', () => {
   const open = menu.getAttribute('aria-expanded') === 'true';
   menu.setAttribute('aria-expanded', String(!open));
   nav.classList.toggle('open', !open);
 });
-document.querySelectorAll('nav a').forEach(a => a.addEventListener('click', () => { nav.classList.remove('open'); menu.setAttribute('aria-expanded', 'false'); }));
+nav?.querySelectorAll('a').forEach(link => link.addEventListener('click', () => {
+  nav.classList.remove('open');
+  menu?.setAttribute('aria-expanded', 'false');
+}));
 
-const observer = new IntersectionObserver(entries => entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('shown'); }), { threshold: .12 });
-document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+/* Révélations d'entrée — discrètes, une seule fois par élément. */
+const reveal = new IntersectionObserver((entries, self) => entries.forEach(entry => {
+  if (!entry.isIntersecting) return;
+  entry.target.classList.add('shown');
+  self.unobserve(entry.target);
+}), { threshold: .05, rootMargin: '0px 0px -5% 0px' });
+document.querySelectorAll('.reveal').forEach(el => reveal.observe(el));
 
-const tooltip = document.querySelector('.map-tooltip');
-document.querySelectorAll('.province-shapes path').forEach(path => {
-  const show = () => { tooltip.innerHTML = `<b>${path.dataset.name}</b><span>${path.dataset.count} contributions <small>— démonstration</small></span>`; };
-  path.addEventListener('mouseenter', show); path.addEventListener('focus', show); path.addEventListener('click', show);
-  path.setAttribute('tabindex', '0'); path.setAttribute('role', 'button'); path.setAttribute('aria-label', `${path.dataset.name}, ${path.dataset.count} contributions de démonstration`);
-});
-document.querySelector('.contribution-form')?.addEventListener('submit', event => { event.preventDefault(); const button = event.currentTarget.querySelector('button'); button.textContent = 'Votre voix compte — merci !'; button.disabled = true; });
+/* Déclaration — chaque mot passe du gris au noir dans l'ordre de lecture. */
+const statement = document.querySelector('[data-statement]');
+if (statement) {
+  const words = statement.textContent.trim().split(/\s+/);
+  statement.textContent = '';
+  words.forEach((word, index) => {
+    const span = document.createElement('span');
+    span.className = 'w';
+    span.textContent = index === words.length - 1 ? word : `${word} `;
+    statement.append(span);
+  });
+  const wordObserver = new IntersectionObserver((entries, self) => entries.forEach(entry => {
+    if (!entry.isIntersecting) return;
+    const spans = [...statement.querySelectorAll('.w')];
+    spans.forEach((span, index) => setTimeout(() => span.classList.add('on'), index * 45));
+    self.disconnect();
+  }), { threshold: .4 });
+  wordObserver.observe(statement);
+}
+
+/* Repérage de la section courante dans la navigation. */
+const links = [...document.querySelectorAll('.main-nav a[href^="#"]')];
+const sections = links.map(link => document.querySelector(link.getAttribute('href'))).filter(Boolean);
+if (sections.length) {
+  const spy = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      links.forEach(link => link.removeAttribute('aria-current'));
+      const active = links.find(link => link.getAttribute('href') === `#${entry.target.id}`);
+      active?.setAttribute('aria-current', 'true');
+    });
+  }, { rootMargin: '-45% 0px -50% 0px' });
+  sections.forEach(section => spy.observe(section));
+}

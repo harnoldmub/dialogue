@@ -1,2 +1,215 @@
 <!doctype html>
-<html lang="fr"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/><meta name="description" content="Envoyez une contribution au Dialogue national."/><title>Participer au Dialogue — CONGO DIALOGUE</title><link rel="icon" href="/favicon.svg" type="image/svg+xml"/><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/><link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,600&display=swap" rel="stylesheet"/></head><body class="participation-page"><div class="national-stripe"><i></i><b></b><em></em></div><header class="participation-header"><a class="brand participation-brand" href="/" aria-label="Retour à l'accueil"><span class="brand-mark">✦</span> CONGO<br/><em>DIALOGUE</em></a><a class="back-link" href="/">← Retour au Dialogue</a></header><main><section class="participation-intro"><p class="eyebrow">Contribution citoyenne</p><h1>Votre voix <em>compte.</em></h1><p>Partagez votre proposition pour contribuer au Dialogue national. Écrivez, parlez ou transmettez un document&nbsp;: choisissez le moyen qui vous convient.</p><div class="methods"><span>✍ Écrire</span><span>◉ Parler</span><span>⌁ Document</span></div></section><form id="contribution-form" class="contribution-page-form" novalidate><fieldset><legend>Vos informations</legend><div class="fields two"><label>Prénom<input name="firstName" autocomplete="given-name" required maxlength="80"/></label><label>Nom<input name="lastName" autocomplete="family-name" required maxlength="80"/></label><label>Email<input name="email" type="email" autocomplete="email" required maxlength="254"/></label><label>Téléphone / WhatsApp <small>facultatif</small><input name="phone" type="tel" autocomplete="tel" maxlength="40"/></label><label>Pays de résidence<input name="country" autocomplete="country-name" required maxlength="100"/></label><label>Ville<input name="city" autocomplete="address-level2" required maxlength="100"/></label><label>Province concernée <small>facultatif</small><input name="province" maxlength="100"/></label><label>Profil <small>facultatif</small><select name="profile"><option value="">Sélectionner</option><option>Citoyen</option><option>Diaspora</option><option>Société civile</option><option>Association</option><option>Jeunesse</option><option>Femme</option><option>Expert</option><option>Entrepreneur</option><option>Autorité traditionnelle</option><option>Confession religieuse</option><option>Autre</option></select></label></div></fieldset><fieldset><legend>Votre proposition</legend><div class="fields two"><label>Thématique<select name="theme" required><option value="">Choisir une thématique</option><option>Paix et sécurité</option><option>Justice</option><option>Gouvernance</option><option>Économie et emploi</option><option>Jeunesse</option><option>Éducation</option><option>Santé</option><option>Femmes</option><option>Diaspora</option><option>Cohésion nationale</option><option>Décentralisation</option><option>Culture</option><option>Numérique et innovation</option><option>Environnement</option><option>Autre</option></select></label><label>Titre de la proposition <small>facultatif</small><input name="title" maxlength="180"/></label></div><section class="contribution-method"><h2>✍ Écrire</h2><label class="full-label">Écrivez votre proposition<textarea name="textContent" maxlength="20000" rows="8" aria-describedby="text-count"></textarea></label><p id="text-count" class="count">0 / 20 000 caractères</p></section><section class="contribution-method recorder"><h2>◉ Parler</h2><p>Enregistrez votre contribution (durée maximale&nbsp;: 10 minutes). Vous pouvez mettre en pause puis reprendre sans perdre votre note.</p><div class="recorder-actions"><button type="button" id="record-button" class="outline-button">🎙 Commencer l’enregistrement</button><button type="button" id="pause-button" class="plain-button" hidden>Mettre en pause</button><button type="button" id="stop-button" class="plain-button" hidden>Terminer</button><span id="recording-time" aria-live="polite">00:00</span></div><div id="recording-indicator" class="recording-indicator" hidden><i></i><span>Microphone actif</span></div><audio id="audio-preview" controls preload="metadata" hidden></audio><button type="button" id="remove-audio" class="remove-button" hidden>Supprimer et recommencer</button><p id="audio-status" class="field-help" aria-live="polite"></p></section><section class="contribution-method"><h2>⌁ Ajouter un document</h2><label class="dropzone" for="files"><strong>Déposez vos fichiers ici</strong><span>ou choisissez des fichiers — PDF, DOC, DOCX, TXT, JPG, JPEG, PNG · 10 Mo maximum par fichier</span><input id="files" name="files" type="file" multiple accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain,image/jpeg,image/png"/></label><ul id="file-list" class="file-list" aria-live="polite"></ul></section></fieldset><label class="consent-page"><input name="consent" type="checkbox" required/><span>J’accepte que ma contribution soit collectée et traitée dans le cadre du Dialogue National. Les contributions ne sont pas rendues publiques automatiquement et peuvent être analysées puis synthétisées.</span></label><p id="form-error" class="form-error" role="alert"></p><button class="submit-contribution" type="submit">Envoyer ma contribution <span>→</span></button></form><section id="confirmation" class="confirmation" hidden><p class="eyebrow">Contribution enregistrée</p><h2>Merci pour votre<br/><em>contribution.</em></h2><p>Votre proposition a bien été enregistrée. Conservez cette référence&nbsp;:</p><strong id="reference"></strong><a class="back-link" href="/">Retour à l’accueil</a></section></main><script type="module" src="/src/participer.js"></script></body></html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Déposez votre contribution au Dialogue national de la République démocratique du Congo : par écrit, par note vocale ou par document." />
+    <meta name="theme-color" content="#06265c" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta property="og:title" content="Déposer une contribution — Congo Dialogue" />
+    <meta property="og:description" content="Formulaire officiel de dépôt d'une contribution au Dialogue national." />
+    <meta property="og:image" content="/assets/hero.jpg" />
+    <title>Déposer une contribution — Congo Dialogue</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  </head>
+  <body>
+    <a class="skip" href="#formulaire">Aller au formulaire</a>
+
+    <div class="flag-stripe" aria-hidden="true"><i></i><b></b><em></em></div>
+    <div class="state-band">
+      <div class="wrap">
+        <p>République démocratique du Congo</p>
+        <p class="devise"><b>Justice</b> · Paix · Travail</p>
+      </div>
+    </div>
+
+    <header class="page-header">
+      <div class="wrap">
+        <a class="brand" href="/" aria-label="Congo Dialogue, accueil">          <span class="brand-text">Dialogue national<strong>Congo Dialogue</strong></span>
+        </a>
+        <a class="back" href="/">Retour à l'accueil</a>
+      </div>
+    </header>
+
+    <main>
+      <div class="wrap">
+        <nav class="breadcrumb" aria-label="Fil d'ariane">
+          <a href="/">Accueil</a><span aria-hidden="true">/</span>Déposer une contribution
+        </nav>
+
+        <div class="form-intro" id="intro">          <h1>Déposer une contribution au Dialogue national</h1>
+          <p class="lead">Décrivez ce que vous observez, ce que vous proposez et ce que cela changerait. Vous pouvez écrire, enregistrer une note vocale ou joindre un document déjà rédigé. Un seul de ces formats suffit.</p>
+        </div>
+      </div>
+
+      <div class="wrap form-layout">
+        <form id="formulaire" novalidate>
+          <fieldset class="form-step">
+            <legend><b>01</b> <span>Vos informations</span></legend>
+            <p class="step-hint">Ces informations servent uniquement au traitement de votre contribution. Elles ne sont pas publiées.</p>
+            <div class="fields">
+              <label class="field">Prénom<input name="firstName" type="text" autocomplete="given-name" required maxlength="80" /></label>
+              <label class="field">Nom<input name="lastName" type="text" autocomplete="family-name" required maxlength="80" /></label>
+              <label class="field">Adresse électronique<input name="email" type="email" autocomplete="email" required maxlength="254" /></label>
+              <label class="field">Téléphone ou WhatsApp <span class="hint">facultatif</span><input name="phone" type="tel" autocomplete="tel" maxlength="40" /></label>
+              <label class="field">Pays de résidence<input name="country" type="text" autocomplete="country-name" required maxlength="100" value="République démocratique du Congo" /></label>
+              <label class="field">Ville ou territoire<input name="city" type="text" autocomplete="address-level2" required maxlength="100" /></label>
+              <label class="field">Province concernée <span class="hint">facultatif</span>
+                <select name="province">
+                  <option value="">Sélectionner une province</option>
+                  <option>Bas-Uele</option><option>Équateur</option><option>Haut-Katanga</option><option>Haut-Lomami</option>
+                  <option>Haut-Uele</option><option>Ituri</option><option>Kasaï</option><option>Kasaï-Central</option>
+                  <option>Kasaï-Oriental</option><option>Kinshasa</option><option>Kongo-Central</option><option>Kwango</option>
+                  <option>Kwilu</option><option>Lomami</option><option>Lualaba</option><option>Mai-Ndombe</option>
+                  <option>Maniema</option><option>Mongala</option><option>Nord-Kivu</option><option>Nord-Ubangi</option>
+                  <option>Sankuru</option><option>Sud-Kivu</option><option>Sud-Ubangi</option><option>Tanganyika</option>
+                  <option>Tshopo</option><option>Tshuapa</option><option>Hors du territoire national</option>
+                </select>
+              </label>
+              <label class="field">Vous contribuez en tant que <span class="hint">facultatif</span>
+                <select name="profile">
+                  <option value="">Sélectionner</option>
+                  <option>Citoyen</option><option>Diaspora</option><option>Société civile</option><option>Association</option>
+                  <option>Jeunesse</option><option>Organisation de femmes</option><option>Expert</option><option>Entrepreneur</option>
+                  <option>Autorité coutumière</option><option>Confession religieuse</option><option>Autre</option>
+                </select>
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset class="form-step">
+            <legend><b>02</b> <span>Objet de la contribution</span></legend>
+            <p class="step-hint">Une contribution par thématique. Si votre proposition touche deux sujets, déposez deux contributions.</p>
+            <div class="fields">
+              <label class="field">Thématique
+                <select name="theme" required>
+                  <option value="">Choisir une thématique</option>
+                  <option>Paix et sécurité</option><option>Justice</option><option>Gouvernance</option>
+                  <option>Économie et emploi</option><option>Jeunesse</option><option>Éducation</option>
+                  <option>Santé</option><option>Femmes</option><option>Diaspora</option>
+                  <option>Cohésion nationale</option><option>Décentralisation</option><option>Culture</option>
+                  <option>Numérique et innovation</option><option>Environnement</option><option>Autre</option>
+                </select>
+              </label>
+              <label class="field">Titre de la proposition <span class="hint">facultatif</span><input name="title" type="text" maxlength="180" placeholder="Ex. Désenclaver les centres de santé du territoire de Walungu" /></label>
+            </div>
+          </fieldset>
+
+          <fieldset class="form-step">
+            <legend><b>03</b> <span>Votre contribution</span></legend>
+            <p class="step-hint">Un format au minimum est requis. Vous pouvez les combiner : un texte court accompagné d'un document, par exemple.</p>
+
+            <section class="method">
+              <h3><b>Format A</b> Écrire votre proposition</h3>
+              <p>Décrivez le constat, la proposition et l'effet attendu. Vingt mille caractères au maximum.</p>
+              <label class="field">Texte de la contribution
+                <textarea name="textContent" maxlength="20000" rows="8" aria-describedby="text-count" placeholder="Constat observé, proposition, résultat attendu…"></textarea>
+              </label>
+              <p id="text-count" class="count">0 / 20 000 caractères</p>
+            </section>
+
+            <section class="method">
+              <h3><b>Format B</b> Enregistrer une note vocale</h3>
+              <p>Parlez dans la langue de votre choix, dix minutes au maximum. Vous pouvez mettre en pause puis reprendre sans perdre l'enregistrement.</p>
+              <div class="recorder-actions">
+                <button type="button" id="record-button" class="btn-sm">Démarrer l'enregistrement</button>
+                <button type="button" id="pause-button" class="btn-sm" hidden>Mettre en pause</button>
+                <button type="button" id="stop-button" class="btn-sm" hidden>Terminer</button>
+                <span class="timer" id="recording-time" aria-live="off">00:00</span>
+                <span class="rec-dot" id="recording-dot" hidden aria-hidden="true"></span>
+              </div>
+              <audio id="audio-preview" controls preload="metadata" hidden></audio>
+              <p><button type="button" id="remove-audio" class="btn-sm quiet" hidden>Supprimer et recommencer</button></p>
+              <p id="audio-status" class="field-help" role="status"></p>
+              <p id="audio-fallback" class="field-help" hidden>Votre navigateur ne permet pas l'enregistrement depuis cette page. Vous pouvez enregistrer la note avec l'application de votre téléphone puis l'envoyer ici :
+                <label class="field" style="margin-top:8px"><input id="audio-file" type="file" accept="audio/*" /></label>
+              </p>
+            </section>
+
+            <section class="method">
+              <h3><b>Format C</b> Joindre un document</h3>
+              <p>Cinq fichiers au maximum, 10 Mo par fichier. Formats acceptés : PDF, DOC, DOCX, TXT, JPG, PNG.</p>
+              <label class="dropzone" for="files">
+                <strong>Choisir des fichiers</strong>
+                <span>ou déposez-les dans ce cadre</span>
+                <input id="files" name="files" type="file" multiple accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain,image/jpeg,image/png" />
+              </label>
+              <ul id="file-list" class="file-list" aria-live="polite"></ul>
+            </section>
+          </fieldset>
+
+          <label class="consent">
+            <input name="consent" type="checkbox" value="on" required />
+            <span>J'accepte que ma contribution soit collectée et traitée dans le cadre du Dialogue national. Les contributions ne sont pas publiées automatiquement ; les extraits repris dans les synthèses le sont sous forme anonymisée.</span>
+          </label>
+
+          <p id="form-error" class="form-alert" role="alert"></p>
+
+          <div class="form-submit">
+            <button class="btn btn-primary" type="submit">Envoyer ma contribution <span class="arw" aria-hidden="true">→</span></button>
+            <button class="link" type="button" id="open-notice">Lire la notice de traitement</button>
+            <span class="note">Une référence de suivi vous sera remise à l'écran.</span>
+          </div>
+        </form>
+
+        <aside class="form-aside">
+          <div class="aside-card">
+            <h2>Avant d'envoyer</h2>
+            <ul>
+              <li>Un seul format suffit : texte, note vocale ou document.</li>
+              <li>Indiquez un fait précis plutôt qu'un constat général.</li>
+              <li>Précisez le territoire ou la ville concernée.</li>
+              <li>Le dépôt est gratuit et ne demande aucun document officiel.</li>
+            </ul>
+          </div>
+          <div class="aside-card">
+            <h2>Vos données</h2>
+            <p>Vos coordonnées servent au traitement de la contribution et à une éventuelle demande de précision. Elles ne sont ni publiées ni transmises à des tiers à des fins commerciales.</p>
+          </div>
+        </aside>
+      </div>
+
+      <dialog id="notice" class="notice-modal" aria-labelledby="notice-title">
+        <div class="notice-head">
+          <h2 id="notice-title">Notice de traitement des données</h2>
+          <button type="button" class="btn-sm quiet" id="close-notice">Fermer</button>
+        </div>
+        <div class="notice-body">
+          <p>Les informations demandées dans ce formulaire sont votre prénom, votre nom, votre adresse électronique, votre téléphone facultatif, votre pays, votre ville ou territoire, votre province facultative et votre qualité de contributeur.</p>
+          <dl>
+            <div><dt>Finalité</dt><dd>Traitement, classement et synthèse des contributions, et prise de contact éventuelle pour une demande de précision.</dd></div>
+            <div><dt>Destinataires</dt><dd>Les équipes chargées de l'analyse des contributions. Aucune donnée n'est cédée à des tiers à des fins commerciales.</dd></div>
+            <div><dt>Publication</dt><dd>Les contributions ne sont pas publiées automatiquement. Les extraits repris dans les synthèses sont anonymisés ; votre nom n'y est associé qu'avec votre accord écrit.</dd></div>
+            <div><dt>Conservation</dt><dd>Jusqu'à la clôture des travaux du Dialogue national, puis archivage sous forme anonymisée.</dd></div>
+            <div><dt>Vos droits</dt><dd>Accès, rectification ou suppression de votre contribution sur présentation de la référence remise lors du dépôt.</dd></div>
+          </dl>
+          <p><a class="link" href="/mentions#donnees" target="_blank" rel="noopener">Ouvrir les mentions légales complètes</a></p>
+        </div>
+      </dialog>
+
+      <div class="wrap">
+        <section id="confirmation" class="confirmation" hidden>          <h1>Votre contribution a bien été enregistrée.</h1>
+          <p>Conservez la référence ci-dessous. Elle identifie votre dépôt en cas de question ultérieure.</p>
+          <strong class="reference" id="reference"></strong>
+          <p>Votre contribution est désormais vérifiée puis classée par thématique et par province avant d'être versée aux travaux du Dialogue national.</p>
+          <div class="confirmation-actions">
+            <a class="btn btn-outline" href="/participer">Déposer une autre contribution</a>
+            <a class="link" href="/">Retour à l'accueil</a>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap footer-bottom">
+        <span>© 2026 Congo Dialogue · République démocratique du Congo</span>
+        <span><a href="/mentions">Mentions légales</a> · <a href="/mentions#accessibilite">Accessibilité</a></span>
+      </div>
+      <div class="flag-stripe" aria-hidden="true"><i></i><b></b><em></em></div>
+    </footer>
+
+    <script type="module" src="/src/participer.js"></script>
+  </body>
+</html>
