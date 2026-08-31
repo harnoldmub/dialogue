@@ -1,4 +1,10 @@
 import './style.css';
+import './identity.css';
+
+// The existing CTAs retain their visual treatment while opening the dedicated flow.
+document.querySelectorAll('a[href="#participer"]').forEach(link => link.addEventListener('click', event => {
+  event.preventDefault(); window.location.href = '/participer';
+}));
 
 const menu = document.querySelector('.menu-toggle');
 const nav = document.querySelector('nav');

@@ -1,0 +1,6 @@
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+CREATE TYPE contribution_status AS ENUM ('RECEIVED','IN_REVIEW','SELECTED','ARCHIVED');
+CREATE SEQUENCE contribution_reference_seq START 1;
+CREATE TABLE contributions (id UUID PRIMARY KEY, reference TEXT UNIQUE NOT NULL DEFAULT ('DIALOGUE-' || EXTRACT(YEAR FROM NOW())::TEXT || '-' || LPAD(nextval('contribution_reference_seq')::TEXT,6,'0')), first_name TEXT NOT NULL,last_name TEXT NOT NULL,email TEXT NOT NULL,phone TEXT,country TEXT NOT NULL,city TEXT NOT NULL,province TEXT,profile TEXT,theme TEXT NOT NULL,title TEXT,text_content TEXT,audio_key TEXT,audio_duration INTEGER,status contribution_status NOT NULL DEFAULT 'RECEIVED',created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW());
+CREATE TABLE contribution_files (id UUID PRIMARY KEY DEFAULT gen_random_uuid(),contribution_id UUID NOT NULL REFERENCES contributions(id) ON DELETE CASCADE,storage_key TEXT NOT NULL,original_name TEXT NOT NULL,mime_type TEXT NOT NULL,size BIGINT NOT NULL CHECK(size > 0),created_at TIMESTAMPTZ NOT NULL DEFAULT NOW());
+CREATE INDEX contributions_status_created_at_idx ON contributions(status,created_at DESC);CREATE INDEX contribution_files_contribution_id_idx ON contribution_files(contribution_id);
