@@ -46,10 +46,13 @@ if (statement) {
 
 /* Aperçu du parcours en modale — la page d'accueil n'est pas quittée. */
 const apercu = document.querySelector('#apercu');
-document.querySelector('#open-apercu')?.addEventListener('click', () => apercu.showModal());
-document.querySelector('#close-apercu')?.addEventListener('click', () => apercu.close());
+// Les liens gardent une destination réelle : sans script, ils mènent au formulaire.
+document.querySelectorAll('#open-apercu, [data-open-apercu]').forEach(trigger => trigger.addEventListener('click', event => {
+  event.preventDefault();
+  apercu.showModal();
+}));
+document.querySelectorAll('#close-apercu, [data-close-apercu]').forEach(button => button.addEventListener('click', () => apercu.close()));
 apercu?.addEventListener('click', event => { if (event.target === apercu) apercu.close(); });
-apercu?.querySelector('[data-close-apercu]')?.addEventListener('click', () => apercu.close());
 
 /* Repérage de la section courante dans la navigation. */
 const links = [...document.querySelectorAll('.main-nav a[href^="#"]')];

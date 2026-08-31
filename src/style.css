@@ -39,15 +39,18 @@ ul,ol{margin:0;padding:0;list-style:none}
 .rule{height:1px;background:var(--line);border:0;margin:0}
 
 /* — Actions (compactes, jamais pleine largeur) — */
-.btn{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:6px;border:1px solid transparent;font-size:14px;font-weight:600;line-height:20px;transition:background .25s var(--ease),color .25s var(--ease),border-color .25s var(--ease),transform .15s var(--ease);cursor:pointer}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:8px;border:1px solid transparent;font-size:14px;font-weight:600;line-height:20px;white-space:nowrap;cursor:pointer;transition:background .25s var(--ease),color .25s var(--ease),border-color .25s var(--ease),box-shadow .25s var(--ease),transform .2s var(--ease)}
+.btn .arw{transition:transform .25s var(--ease)}
+.btn:hover .arw{transform:translateX(3px)}
 .btn:active{transform:translateY(1px)}
-.btn-primary{background:var(--blue);color:#fff}
-.btn-primary:hover{background:var(--blue-mid)}
+.btn-primary{background:var(--blue);color:#fff;box-shadow:0 1px 2px rgba(6,38,92,.2)}
+.btn-primary:hover{background:var(--blue-mid);box-shadow:0 6px 16px rgba(6,38,92,.22);transform:translateY(-1px)}
 .btn-outline{border-color:var(--line);background:#fff;color:var(--ink)}
-.btn-outline:hover{border-color:var(--blue);background:var(--pale)}
-.btn-ghost-light{border-color:rgba(255,255,255,.4);color:#fff}
-.btn-ghost-light:hover{background:rgba(255,255,255,.1)}
-.btn .arw{font-size:14px;line-height:1}
+.btn-outline:hover{border-color:var(--blue);background:var(--pale);transform:translateY(-1px)}
+.btn-ghost-light{border-color:rgba(255,255,255,.45);color:#fff}
+.btn-ghost-light:hover{background:rgba(255,255,255,.12);border-color:#fff;transform:translateY(-1px)}
+.btn-close{display:inline-grid;place-items:center;width:36px;height:36px;padding:0;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--muted);font-size:18px;line-height:1;cursor:pointer;transition:background .25s var(--ease),color .25s var(--ease),border-color .25s var(--ease)}
+.btn-close:hover{background:var(--pale);border-color:var(--blue-mid);color:var(--ink)}
 .link{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:600;color:var(--link);border-bottom:1px solid currentColor;padding-bottom:2px;transition:opacity .25s var(--ease)}
 .link:hover{opacity:.7}
 .link.on-navy{color:#fff;border-color:rgba(255,255,255,.5)}
@@ -188,7 +191,9 @@ ul,ol{margin:0;padding:0;list-style:none}
 .modal-steps b{white-space:nowrap;font:500 12px "Geist Mono","Geist Mono Fallback",ui-monospace,monospace;letter-spacing:.08em;color:var(--blue-mid)}
 .modal-steps h3{font-size:15px}
 .modal-steps p{margin-top:4px;font-size:14px;line-height:1.6;color:var(--muted)}
-.modal-foot{display:flex;flex-wrap:wrap;gap:16px 24px;align-items:center;padding-top:8px;border-top:1px solid var(--line-soft)}
+.modal-foot{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-top:8px;padding-top:24px;border-top:1px solid var(--line-soft)}
+.modal-section{margin-top:8px;padding-top:24px;border-top:1px solid var(--line-soft)}
+.modal-section>h3{font-size:14px;margin-bottom:16px}
 
 /* — Révélations — */
 .js .reveal{opacity:0;transform:translateY(16px);transition:opacity .7s var(--ease),transform .7s var(--ease)}

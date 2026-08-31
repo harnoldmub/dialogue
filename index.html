@@ -163,30 +163,10 @@
         </div>
       </section>
 
-      <section class="section pale" id="parcours">
-        <div class="wrap">
-          <div class="section-head reveal">
-            <div>
-              <p class="eyebrow"><b>04</b> Traitement</p>
-              <h2>Ce qui arrive à votre contribution.</h2>
-            </div>
-            <p>Chaque dépôt suit le même parcours, quel que soit son format et son lieu d'origine.</p>
-          </div>
-          <ol class="journey reveal">
-            <li><b>Étape 01</b><h3>Réception</h3><p>Le dépôt est horodaté et reçoit une référence unique.</p></li>
-            <li><b>Étape 02</b><h3>Recevabilité</h3><p>Vérification du contenu et retrait des envois hors sujet ou injurieux.</p></li>
-            <li><b>Étape 03</b><h3>Analyse thématique</h3><p>Classement par thématique et par province, transcription des notes vocales.</p></li>
-            <li><b>Étape 04</b><h3>Synthèse provinciale</h3><p>Regroupement des propositions convergentes en une note par province.</p></li>
-            <li><b>Étape 05</b><h3>Travaux du Dialogue</h3><p>Les synthèses sont versées aux commissions thématiques.</p></li>
-            <li><b>Étape 06</b><h3>Pacte national</h3><p>Les engagements retenus sont publiés et rendus opposables au suivi.</p></li>
-          </ol>
-        </div>
-      </section>
-
-      <section class="section" id="questions">
+      <section class="section pale" id="questions">
         <div class="wrap faq">
           <div class="reveal">
-            <p class="eyebrow"><b>05</b> Questions fréquentes</p>
+            <p class="eyebrow"><b>04</b> Questions fréquentes</p>
             <h2>Vos questions avant de contribuer.</h2>
             <p class="faq-note">Une question qui ne figure pas ici ? Déposez-la comme contribution : les demandes de précision sont relevées avec le reste.</p>
           </div>
@@ -227,11 +207,11 @@
         </div>
       </section>
 
-      <section class="section pale" id="documents">
+      <section class="section" id="documents">
         <div class="wrap">
           <div class="section-head reveal">
             <div>
-              <p class="eyebrow"><b>06</b> Documents et repères</p>
+              <p class="eyebrow"><b>05</b> Documents et repères</p>
               <h2>Les références du Dialogue national.</h2>
             </div>
             <p>Les documents officiels publiés à ce jour et les repères utiles pour préparer une contribution.</p>
@@ -252,10 +232,10 @@
               </a>
             </li>
             <li>
-              <a href="#parcours">
+              <a href="/participer" data-open-apercu>
                 <span class="meta">Procédure</span>
                 <h3>Parcours d'une contribution, de la réception au pacte national</h3>
-                <span class="kind">Sur cette page →</span>
+                <span class="kind">Voir le détail →</span>
               </a>
             </li>
             <li>
@@ -283,7 +263,7 @@
       <dialog id="apercu" class="notice-modal" aria-labelledby="apercu-title">
         <div class="notice-head">
           <h2 id="apercu-title">Comment se passe un dépôt</h2>
-          <button type="button" class="btn-sm quiet" id="close-apercu">Fermer</button>
+          <button type="button" class="btn-close" id="close-apercu" aria-label="Fermer">×</button>
         </div>
         <div class="notice-body">
           <p>Aucun compte à créer, aucune pièce officielle à fournir. Le formulaire tient sur une page et prend une quinzaine de minutes.</p>
@@ -293,8 +273,21 @@
             <li><b>Étape 03</b><div><h3>Exprimez votre proposition</h3><p>Écrivez, enregistrez une note vocale de dix minutes au maximum ou joignez un document. Un seul format suffit.</p></div></li>
             <li><b>Étape 04</b><div><h3>Conservez votre référence</h3><p>Elle s'affiche dès l'envoi et identifie votre dépôt pendant tout le traitement.</p></div></li>
           </ol>
-          <p>Votre contribution est ensuite vérifiée, classée par thématique et par province, puis synthétisée pour les travaux du Dialogue national.</p>
-          <p class="modal-foot"><a class="btn btn-primary" href="/participer">Déposer une contribution <span class="arw" aria-hidden="true">→</span></a> <a class="link" href="#parcours" data-close-apercu>Voir le parcours complet</a></p>
+          <div class="modal-section">
+            <h3>Ce qui se passe après l'envoi</h3>
+            <ol class="modal-steps">
+              <li><b>Étape 01</b><div><h3>Réception</h3><p>Le dépôt est horodaté et reçoit une référence unique.</p></div></li>
+              <li><b>Étape 02</b><div><h3>Recevabilité</h3><p>Vérification du contenu et retrait des envois hors sujet ou injurieux.</p></div></li>
+              <li><b>Étape 03</b><div><h3>Analyse thématique</h3><p>Classement par thématique et par province, transcription des notes vocales.</p></div></li>
+              <li><b>Étape 04</b><div><h3>Synthèse provinciale</h3><p>Regroupement des propositions convergentes en une note par province.</p></div></li>
+              <li><b>Étape 05</b><div><h3>Travaux du Dialogue</h3><p>Les synthèses sont versées aux commissions thématiques.</p></div></li>
+              <li><b>Étape 06</b><div><h3>Pacte national</h3><p>Les engagements retenus sont publiés et rendus opposables au suivi.</p></div></li>
+            </ol>
+          </div>
+          <div class="modal-foot">
+            <a class="btn btn-primary" href="/participer">Déposer une contribution <span class="arw" aria-hidden="true">→</span></a>
+            <button type="button" class="btn btn-outline" data-close-apercu>Fermer</button>
+          </div>
         </div>
       </dialog>
     </main>
@@ -319,7 +312,7 @@
           <h3>Informations</h3>
           <ul>
             <li><a href="#documents">Documents officiels</a></li>
-            <li><a href="#parcours">Traitement des contributions</a></li>
+            <li><a href="/participer" data-open-apercu>Traitement des contributions</a></li>
             <li><a href="/mentions">Mentions légales</a></li>
             <li><a href="/mentions#donnees">Données personnelles</a></li>
           </ul>

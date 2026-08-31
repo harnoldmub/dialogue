@@ -172,7 +172,7 @@ dropzone.addEventListener('drop', event => { event.preventDefault(); addFiles(ev
 /* — Notice de traitement : modale, pour ne pas quitter un formulaire en cours de saisie. — */
 const notice = document.querySelector('#notice');
 document.querySelector('#open-notice')?.addEventListener('click', () => notice.showModal());
-document.querySelector('#close-notice')?.addEventListener('click', () => notice.close());
+document.querySelectorAll('#close-notice, [data-close-notice]').forEach(button => button.addEventListener('click', () => notice.close()));
 notice?.addEventListener('click', event => { if (event.target === notice) notice.close(); });
 
 /* — Envoi — */
