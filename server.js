@@ -94,7 +94,11 @@ app.post('/api/contributions', (req, res) => {
 
 app.get('/health', (_req, res) => res.json({ ok: true }));
 
-app.use(express.static(dist, { maxAge: '1h', index: 'index.html' }));
+// Les pages HTML ne sont jamais mises en cache : elles pointent vers des assets hachés.
+app.use(express.static(dist, {
+  index: 'index.html',
+  setHeaders: (res, filePath) => res.setHeader('Cache-Control', filePath.endsWith('.html') ? 'no-cache' : 'public, max-age=3600')
+}));
 app.get('/participer', (_req, res) => res.sendFile(path.join(dist, 'participer.html')));
 app.get('/mentions', (_req, res) => res.sendFile(path.join(dist, 'mentions.html')));
 app.get('/{*splat}', (_req, res) => res.status(404).sendFile(path.join(dist, '404.html')));

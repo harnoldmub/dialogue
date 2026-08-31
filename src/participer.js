@@ -70,12 +70,15 @@ const audioFile = document.querySelector('#audio-file');
 const level = document.querySelector('#level');
 const bars = [...level.querySelectorAll('b i')];
 let recorder = null, chunks = [], elapsed = 0, ticker = null;
-let audioContext = null, meter = null, peak = 0, startedAt = 0, silentWarned = false;
+let audioContext = null, meter = null, peak = 0, startedAt = 0, silentWarned = false, micLabel = '';
 
 /* Un micro muet produit un fichier parfaitement valide mais inaudible : on montre le
    niveau capté en direct et on prévient si rien n'a été enregistré. */
-function startMeter(stream){
+async function startMeter(stream){
   audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  // Après l'attente de l'autorisation micro, le contexte démarre suspendu : sans reprise,
+  // l'analyseur ne lit que des zéros et la jauge reste plate à tort.
+  if (audioContext.state === 'suspended') await audioContext.resume();
   const analyser = audioContext.createAnalyser();
   analyser.fftSize = 1024;
   audioContext.createMediaStreamSource(stream).connect(analyser);
@@ -102,8 +105,8 @@ function startMeter(stream){
         silentWarned = muet;
         audioStatus.classList.toggle('warn', muet);
         audioStatus.textContent = muet
-          ? 'Aucun son n’est capté pour l’instant : vérifiez que le bon microphone est sélectionné et qu’il n’est pas coupé.'
-          : 'Enregistrement en cours. Parlez normalement, à environ vingt centimètres du micro.';
+          ? `Aucun son n’est capté pour l’instant${micLabel ? ` sur « ${micLabel} »` : ''} : vérifiez l’entrée sélectionnée et son volume dans les réglages de votre appareil.`
+          : 'Enregistrement en cours. Continuez, le son est capté.';
       }
     }
     meter = requestAnimationFrame(draw);
@@ -153,19 +156,19 @@ record?.addEventListener('click', async () => {
       audio = { blob, duration: elapsed };
       preview.src = URL.createObjectURL(blob);
       preview.hidden = false; removeAudio.hidden = false;
-      if (peak < 0.008) {
-        audioStatus.classList.add('warn');
-        audioStatus.textContent = 'Enregistrement terminé, mais aucun son n’a été capté : votre micro est muet ou une autre entrée est sélectionnée. Vérifiez le réglage de votre appareil, puis recommencez.';
-      } else {
-        audioStatus.classList.remove('warn');
-        audioStatus.textContent = `Note vocale prête à être envoyée (${timer.textContent}). Écoutez-la ci-dessous avant l’envoi.`;
-      }
+      audioStatus.classList.remove('warn');
+      audioStatus.textContent = `Note vocale prête à être envoyée (${timer.textContent}). Écoutez-la ci-dessous avant l’envoi.`;
+      checkBlobAudio(blob);
     };
-    startMeter(stream);
+    await startMeter(stream);
     recorder.start(1000);
     startTicker();
     record.hidden = true; pause.hidden = false; stop.hidden = false; dot.hidden = false;
-    audioStatus.textContent = 'Enregistrement en cours. Parlez normalement, à environ vingt centimètres du micro.';
+    const track = stream.getAudioTracks()[0];
+    micLabel = track?.label || '';
+    audioStatus.textContent = micLabel
+      ? `Enregistrement en cours sur « ${micLabel} ». Parlez normalement, à environ vingt centimètres du micro.`
+      : 'Enregistrement en cours. Parlez normalement, à environ vingt centimètres du micro.';
   } catch (error) {
     audioStatus.classList.add('warn');
     audioStatus.textContent = error?.name === 'NotAllowedError'
@@ -195,6 +198,26 @@ audioFile?.addEventListener('change', () => {
   audioStatus.classList.remove('warn');
   audioStatus.textContent = `${file.name} sera envoyé comme note vocale.`;
 });
+
+/* Vérification sur le fichier lui-même : c'est la seule mesure qui fasse foi. */
+async function checkBlobAudio(blob){
+  try {
+    const context = new (window.AudioContext || window.webkitAudioContext)();
+    const buffer = await context.decodeAudioData(await blob.arrayBuffer());
+    let max = 0;
+    for (let channel = 0; channel < buffer.numberOfChannels; channel++) {
+      const data = buffer.getChannelData(channel);
+      for (let i = 0; i < data.length; i += 64) max = Math.max(max, Math.abs(data[i]));
+    }
+    context.close();
+    if (max < 0.005) {
+      audioStatus.classList.add('warn');
+      audioStatus.textContent = `La note enregistrée est silencieuse${micLabel ? ` : « ${micLabel} » n’a transmis aucun son` : ''}. Vérifiez l’entrée micro et son volume dans les réglages de votre appareil, puis recommencez.`;
+    }
+  } catch {
+    // Décodage impossible : on laisse l'écoute manuelle trancher.
+  }
+}
 
 /* — Format C : documents — */
 function renderFiles(){
