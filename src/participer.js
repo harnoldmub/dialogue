@@ -67,7 +67,56 @@ const removeAudio = document.querySelector('#remove-audio');
 const audioStatus = document.querySelector('#audio-status');
 const fallback = document.querySelector('#audio-fallback');
 const audioFile = document.querySelector('#audio-file');
+const level = document.querySelector('#level');
+const bars = [...level.querySelectorAll('b i')];
 let recorder = null, chunks = [], elapsed = 0, ticker = null;
+let audioContext = null, meter = null, peak = 0, startedAt = 0, silentWarned = false;
+
+/* Un micro muet produit un fichier parfaitement valide mais inaudible : on montre le
+   niveau capté en direct et on prévient si rien n'a été enregistré. */
+function startMeter(stream){
+  audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  const analyser = audioContext.createAnalyser();
+  analyser.fftSize = 1024;
+  audioContext.createMediaStreamSource(stream).connect(analyser);
+  const samples = new Float32Array(analyser.fftSize);
+  peak = 0; startedAt = Date.now(); silentWarned = false;
+  level.hidden = false;
+  const draw = () => {
+    if (!audioContext) return;
+    analyser.getFloatTimeDomainData(samples);
+    let sum = 0;
+    for (const sample of samples) sum += sample * sample;
+    const rms = Math.sqrt(sum / samples.length);
+    if (recorder?.state === 'recording') peak = Math.max(peak, rms);
+    const active = Math.min(bars.length, Math.round(Math.sqrt(rms) * 2.4 * bars.length));
+    bars.forEach((bar, index) => {
+      const on = index < active;
+      bar.classList.toggle('on', on);
+      bar.style.height = `${4 + (on ? index + 1 : 0) * 1.5}px`;
+    });
+    // Prévenir pendant l'enregistrement plutôt qu'après six minutes perdues.
+    if (recorder?.state === 'recording' && Date.now() - startedAt > 2500) {
+      const muet = peak < 0.008;
+      if (muet !== silentWarned) {
+        silentWarned = muet;
+        audioStatus.classList.toggle('warn', muet);
+        audioStatus.textContent = muet
+          ? 'Aucun son n’est capté pour l’instant : vérifiez que le bon microphone est sélectionné et qu’il n’est pas coupé.'
+          : 'Enregistrement en cours. Parlez normalement, à environ vingt centimètres du micro.';
+      }
+    }
+    meter = requestAnimationFrame(draw);
+  };
+  draw();
+}
+function stopMeter(){
+  cancelAnimationFrame(meter);
+  audioContext?.close();
+  audioContext = null;
+  level.hidden = true;
+  bars.forEach(bar => { bar.classList.remove('on'); bar.style.height = ''; });
+}
 
 const canRecord = Boolean(window.MediaRecorder && navigator.mediaDevices?.getUserMedia);
 if (!canRecord) { record.hidden = true; fallback.hidden = false; }
@@ -80,6 +129,7 @@ const startTicker = () => {
 };
 function finishRecording(){
   clearInterval(ticker);
+  stopMeter();
   if (recorder && recorder.state !== 'inactive') recorder.stop();
   record.hidden = false; record.textContent = 'Reprendre un nouvel enregistrement';
   pause.hidden = true; stop.hidden = true; dot.hidden = true;
@@ -90,7 +140,7 @@ record?.addEventListener('click', async () => {
   audioStatus.classList.remove('warn');
   audioStatus.textContent = 'Autorisation du microphone en cours…';
   try {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } });
     // isTypeSupported doit être appelée sur MediaRecorder, jamais détachée de son objet.
     const mimeType = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4'].find(type => MediaRecorder.isTypeSupported(type));
     recorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
@@ -103,8 +153,15 @@ record?.addEventListener('click', async () => {
       audio = { blob, duration: elapsed };
       preview.src = URL.createObjectURL(blob);
       preview.hidden = false; removeAudio.hidden = false;
-      audioStatus.textContent = `Note vocale prête à être envoyée (${timer.textContent}).`;
+      if (peak < 0.008) {
+        audioStatus.classList.add('warn');
+        audioStatus.textContent = 'Enregistrement terminé, mais aucun son n’a été capté : votre micro est muet ou une autre entrée est sélectionnée. Vérifiez le réglage de votre appareil, puis recommencez.';
+      } else {
+        audioStatus.classList.remove('warn');
+        audioStatus.textContent = `Note vocale prête à être envoyée (${timer.textContent}). Écoutez-la ci-dessous avant l’envoi.`;
+      }
     };
+    startMeter(stream);
     recorder.start(1000);
     startTicker();
     record.hidden = true; pause.hidden = false; stop.hidden = false; dot.hidden = false;
@@ -120,8 +177,8 @@ record?.addEventListener('click', async () => {
 });
 pause?.addEventListener('click', () => {
   if (!recorder) return;
-  if (recorder.state === 'recording') { recorder.pause(); clearInterval(ticker); pause.textContent = 'Reprendre'; dot.hidden = true; audioStatus.textContent = 'Enregistrement en pause.'; }
-  else { recorder.resume(); startTicker(); pause.textContent = 'Mettre en pause'; dot.hidden = false; audioStatus.textContent = 'Enregistrement en cours.'; }
+  if (recorder.state === 'recording') { recorder.pause(); clearInterval(ticker); pause.textContent = 'Reprendre'; dot.hidden = true; level.hidden = true; audioStatus.textContent = 'Enregistrement en pause.'; }
+  else { recorder.resume(); startTicker(); pause.textContent = 'Mettre en pause'; dot.hidden = false; level.hidden = false; audioStatus.textContent = 'Enregistrement en cours.'; }
 });
 stop?.addEventListener('click', finishRecording);
 removeAudio?.addEventListener('click', () => {

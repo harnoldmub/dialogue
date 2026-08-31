@@ -47,6 +47,11 @@ input[aria-invalid=true],select[aria-invalid=true],textarea[aria-invalid=true]{b
 .recorder-actions{display:flex;flex-wrap:wrap;align-items:center;gap:12px}
 .timer{font:500 14px "Geist Mono","Geist Mono Fallback",ui-monospace,monospace;color:var(--muted);font-variant-numeric:tabular-nums}
 .rec-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--red);animation:pulse 1.6s infinite}
+.level{display:flex;gap:8px;align-items:center;margin-top:16px;font-size:12px;color:var(--muted)}
+.level span{font-family:"Geist Mono","Geist Mono Fallback",ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase}
+.level b{display:flex;gap:3px;align-items:flex-end;height:22px;font-weight:400}
+.level i{display:block;width:6px;height:4px;border-radius:2px;background:var(--line-soft);transition:height .08s linear,background .08s linear}
+.level i.on{background:var(--blue-mid)}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
 audio{width:100%;max-width:420px;margin-top:16px}
 .field-help{margin-top:12px;font-size:13px;color:var(--muted)}
