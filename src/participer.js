@@ -85,7 +85,7 @@ const fallback = document.querySelector('#audio-fallback');
 const audioFile = document.querySelector('#audio-file');
 const level = document.querySelector('#level');
 const bars = [...level.querySelectorAll('b i')];
-let recorder = null, chunks = [], elapsed = 0, ticker = null;
+let recorder = null, elapsed = 0, ticker = null, previewUrl = null;
 let audioContext = null, meter = null, peak = 0, startedAt = 0, silentWarned = false, micLabel = '';
 
 /* Un micro muet produit un fichier parfaitement valide mais inaudible : on montre le
@@ -144,13 +144,46 @@ const renderTime = () => {
   timer.textContent = `${String(Math.floor(elapsed / 60)).padStart(2, '0')}:${String(elapsed % 60).padStart(2, '0')}`;
 };
 const startTicker = () => {
+  clearInterval(ticker);
   ticker = setInterval(() => { elapsed++; renderTime(); if (elapsed >= MAX_SECONDS) finishRecording(); }, 1000);
 };
+function clearPreview(){
+  preview.pause();
+  preview.onloadedmetadata = null;
+  preview.onerror = null;
+  preview.removeAttribute('src');
+  preview.load();
+  if (previewUrl) URL.revokeObjectURL(previewUrl);
+  previewUrl = null;
+  preview.hidden = true;
+}
+function showRecording(blob){
+  clearPreview();
+  previewUrl = URL.createObjectURL(blob);
+  preview.onloadedmetadata = () => {
+    // Certains navigateurs mettent à jour la durée après le premier chargement.
+    if (Number.isFinite(preview.duration) && preview.duration > 0) audio.duration = Math.ceil(preview.duration);
+  };
+  preview.onerror = () => {
+    preview.hidden = true;
+    fallback.hidden = false;
+    audioStatus.classList.add('warn');
+    audioStatus.textContent = 'Cette note n’est pas lisible sur cet appareil. Enregistrez-la avec votre téléphone puis envoyez le fichier audio ci-dessous.';
+  };
+  preview.src = previewUrl;
+  preview.hidden = false;
+  // Charge explicitement les métadonnées : indispensable sur Safari après un Blob récent.
+  preview.load();
+}
 function finishRecording(){
   clearInterval(ticker);
   stopMeter();
-  if (recorder && recorder.state !== 'inactive') recorder.stop();
-  record.hidden = false; record.textContent = 'Reprendre un nouvel enregistrement';
+  if (recorder && recorder.state !== 'inactive') {
+    // Le dernier fragment peut ne pas être émis avant stop(), surtout sur Safari/iOS.
+    try { recorder.requestData(); } catch { /* l'enregistreur est déjà en arrêt */ }
+    recorder.stop();
+  }
+  record.hidden = false; record.textContent = 'Enregistrer une nouvelle version';
   pause.hidden = true; stop.hidden = true; dot.hidden = true;
   pause.textContent = 'Mettre en pause';
 }
@@ -161,23 +194,27 @@ record?.addEventListener('click', async () => {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } });
     // isTypeSupported doit être appelée sur MediaRecorder, jamais détachée de son objet.
-    const mimeType = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4'].find(type => MediaRecorder.isTypeSupported(type));
-    recorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
-    chunks = []; elapsed = 0; renderTime();
-    recorder.ondataavailable = event => { if (event.data.size) chunks.push(event.data); };
-    recorder.onstop = () => {
+    const mimeType = ['audio/mp4', 'audio/webm;codecs=opus', 'audio/webm', 'audio/ogg;codecs=opus'].find(type => MediaRecorder.isTypeSupported(type));
+    const activeRecorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
+    recorder = activeRecorder;
+    const recordingChunks = [];
+    elapsed = 0; renderTime();
+    activeRecorder.ondataavailable = event => { if (event.data.size) recordingChunks.push(event.data); };
+    activeRecorder.onstop = () => {
       stream.getTracks().forEach(track => track.stop());
-      const blob = new Blob(chunks, { type: recorder.mimeType || 'audio/webm' });
+      // Le type du fragment est la source fiable : recorder.mimeType peut être vide sur iOS.
+      const recordedType = recordingChunks.find(chunk => chunk.type)?.type || activeRecorder.mimeType || mimeType || 'audio/webm';
+      const blob = new Blob(recordingChunks, { type: recordedType });
       if (!blob.size) { audioStatus.classList.add('warn'); audioStatus.textContent = 'Aucun son n’a été capté. Vérifiez votre microphone puis recommencez.'; return; }
       audio = { blob, duration: elapsed };
-      preview.src = URL.createObjectURL(blob);
-      preview.hidden = false; removeAudio.hidden = false;
+      showRecording(blob);
+      removeAudio.hidden = false;
       audioStatus.classList.remove('warn');
       audioStatus.textContent = `Note vocale prête à être envoyée (${timer.textContent}). Écoutez-la ci-dessous avant l’envoi.`;
       checkBlobAudio(blob);
     };
     await startMeter(stream);
-    recorder.start(1000);
+    activeRecorder.start(1000);
     startTicker();
     record.hidden = true; pause.hidden = false; stop.hidden = false; dot.hidden = false;
     const track = stream.getAudioTracks()[0];
@@ -202,7 +239,7 @@ pause?.addEventListener('click', () => {
 stop?.addEventListener('click', finishRecording);
 removeAudio?.addEventListener('click', () => {
   audio = { blob: null, duration: 0 };
-  preview.hidden = true; preview.removeAttribute('src'); removeAudio.hidden = true;
+  clearPreview(); removeAudio.hidden = true;
   elapsed = 0; renderTime();
   audioStatus.textContent = 'Enregistrement supprimé.';
 });
