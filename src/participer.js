@@ -15,14 +15,14 @@ const dropzone = document.querySelector('.dropzone');
 /* Pays : REST Countries, mis en mémoire une fois pour une recherche instantanée. */
 async function setupCountrySearch(){
   const input=form.elements.country;if(!input)return;
-  const label=input.closest('label');const picker=document.createElement('div');picker.className='country-picker';label.insertBefore(picker,input);picker.append(input);
+  const label=input.closest('label'),provinceField=document.querySelector('#province-field');const toggleProvince=()=>{const isRdc=input.dataset.countryCode==='CD'||/^(république démocratique du congo|rdc|drc|democratic republic of the congo)$/i.test(input.value.trim());provinceField.hidden=!isRdc;if(!isRdc)form.elements.province.value=''};const picker=document.createElement('div');picker.className='country-picker';label.insertBefore(picker,input);picker.append(input);
   const flag=document.createElement('span');flag.className='country-flag';flag.textContent='🇨🇩';picker.append(flag);
   const results=document.createElement('ul');results.className='country-results';results.hidden=true;picker.append(results);
   const note=document.createElement('p');note.className='country-loading';note.textContent='Chargement des pays…';label.append(note);let countries=[];
   const normalise=value=>value.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
-  const choose=country=>{input.value=country.name;input.dataset.countryCode=country.code;flag.textContent=country.flag||'🌐';results.hidden=true};
+  const choose=country=>{input.value=country.name;input.dataset.countryCode=country.code;flag.textContent=country.flag||'🌐';results.hidden=true;toggleProvince()};
   const render=()=>{const term=normalise(input.value);const matches=countries.filter(country=>normalise(`${country.name} ${country.search}`).includes(term)).slice(0,80);results.innerHTML='';matches.forEach(country=>{const li=document.createElement('li'),button=document.createElement('button');button.type='button';button.innerHTML=`<span>${country.flag||'🌐'}</span>${country.name}<small>${country.code}</small>`;button.onclick=()=>choose(country);li.append(button);results.append(li)});results.hidden=!matches.length};
-  input.placeholder='Rechercher un pays';input.autocomplete='off';input.addEventListener('focus',render);input.addEventListener('input',()=>{input.dataset.countryCode='';flag.textContent='🌐';render()});input.addEventListener('blur',()=>setTimeout(()=>results.hidden=true,150));
+  input.placeholder='Rechercher un pays';input.autocomplete='off';input.addEventListener('focus',render);input.addEventListener('input',()=>{input.dataset.countryCode='';flag.textContent='🌐';toggleProvince();render()});input.addEventListener('blur',()=>setTimeout(()=>results.hidden=true,150));toggleProvince();
   try{const response=await fetch('https://restcountries.com/v3.1/all?fields=name,translations,cca2,flag');if(!response.ok)throw new Error();const raw=await response.json();countries=raw.map(item=>({name:item.translations?.fra?.common||item.name?.common,search:[item.name?.common,item.translations?.fra?.official].filter(Boolean).join(' '),code:item.cca2,flag:item.flag})).filter(item=>item.name&&item.code).sort((a,b)=>a.name.localeCompare(b.name,'fr'));note.remove();choose(countries.find(country=>country.code==='CD')||countries[0])}catch{note.textContent='Recherche momentanément indisponible : saisissez votre pays.';flag.textContent='🌐'}
 }
 setupCountrySearch();
