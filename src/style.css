@@ -67,6 +67,8 @@ ul,ol{margin:0;padding:0;list-style:none}
 .main-nav a:hover{color:var(--link)}
 .main-nav a[aria-current="true"]{border-color:var(--blue);font-weight:600}
 .header-action{margin-left:8px}
+.participation-action{margin-top:28px;text-align:center}
+.faq-action{margin-top:28px}
 .menu-toggle{display:none;margin-left:auto;align-items:center;gap:8px;padding:8px 12px;border:1px solid var(--line);border-radius:6px;background:#fff;font-size:14px;font-weight:600}
 .menu-toggle i{display:block;width:16px;height:10px;position:relative}
 .menu-toggle i::before,.menu-toggle i::after{content:"";position:absolute;left:0;right:0;height:1.5px;background:var(--ink);transition:transform .35s var(--ease),top .35s var(--ease)}
