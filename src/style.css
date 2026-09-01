@@ -97,6 +97,7 @@ ul,ol{margin:0;padding:0;list-style:none}
 .figures li{padding:24px;border-right:1px solid var(--line);background:#fff}
 .figures li:last-child{border-right:0}
 .figures strong{display:block;font-size:36px;line-height:1.1;font-weight:600;letter-spacing:-.02em;color:var(--blue)}
+.process-markers strong{font-size:23px;line-height:1.15;letter-spacing:-.025em}
 .figures span{display:block;margin-top:8px;font-size:14px;color:var(--muted)}
 
 /* — Texte éditorial — */
