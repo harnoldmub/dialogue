@@ -81,12 +81,63 @@ const dot = document.querySelector('#recording-dot');
 const preview = document.querySelector('#audio-preview');
 const removeAudio = document.querySelector('#remove-audio');
 const audioStatus = document.querySelector('#audio-status');
-const fallback = document.querySelector('#audio-fallback');
 const audioFile = document.querySelector('#audio-file');
+const audioFileName = document.querySelector('#audio-file-name');
 const level = document.querySelector('#level');
+const microphoneGuidance = document.querySelector('#microphone-guidance');
+const microphoneTitle = document.querySelector('#microphone-title');
+const microphoneMessage = document.querySelector('#microphone-message');
+const retryMicrophone = document.querySelector('#retry-microphone');
+const microphoneHelp = document.querySelector('#microphone-help');
+const microphoneInstructions = document.querySelector('#microphone-instructions');
 const bars = [...level.querySelectorAll('b i')];
 let recorder = null, elapsed = 0, ticker = null, previewUrl = null;
 let audioContext = null, meter = null, peak = 0, startedAt = 0, silentWarned = false, micLabel = '';
+
+const getUserMediaAvailable = Boolean(navigator.mediaDevices?.getUserMedia);
+const mediaRecorderAvailable = Boolean(window.MediaRecorder);
+const recorderMimeTypes = ['audio/mp4', 'audio/webm;codecs=opus', 'audio/webm', 'audio/ogg;codecs=opus'];
+
+function logMicrophoneError(stage, error){
+  console.error(`[Microphone] ${stage}`, {
+    name: error?.name || 'UnknownError',
+    message: error?.message || 'Aucun détail fourni',
+    constraint: error?.constraint || null
+  });
+}
+function hideMicrophoneGuidance(){
+  microphoneGuidance.hidden = true;
+  microphoneInstructions.hidden = true;
+  microphoneHelp.setAttribute('aria-expanded', 'false');
+}
+function showMicrophoneGuidance({ title, message, retry = true, instructions = false }){
+  microphoneTitle.textContent = title;
+  microphoneMessage.textContent = message;
+  retryMicrophone.hidden = !retry;
+  microphoneGuidance.hidden = false;
+  microphoneInstructions.hidden = !instructions;
+  microphoneHelp.setAttribute('aria-expanded', String(instructions));
+}
+function showMicrophoneError(error){
+  const name = error?.name || 'UnknownError';
+  const messages = {
+    NotAllowedError: ['Microphone non autorisé', "Le microphone n'est pas autorisé pour ce site. Autorisez-le dans les réglages Safari, puis réessayez."],
+    NotFoundError: ['Microphone introuvable', "Aucun microphone n'a été détecté. Branchez ou activez un microphone, puis réessayez."],
+    NotReadableError: ['Microphone indisponible', "Le microphone est peut-être utilisé par une autre application ou un autre appel. Fermez-la, puis réessayez."],
+    AbortError: ['Enregistrement interrompu', "L'accès au microphone a été interrompu. Réessayez."],
+    SecurityError: ['Accès sécurisé requis', "Safari a bloqué l'accès au microphone pour des raisons de sécurité. Ouvrez cette page directement en HTTPS, sans navigation privée ni iframe."],
+    OverconstrainedError: ['Configuration audio incompatible', "Les réglages audio demandés ne sont pas disponibles sur cet appareil. Réessayez."],
+    TypeError: ['Microphone indisponible', "Le navigateur n'autorise pas l'accès au microphone depuis cette page. Vérifiez que l'adresse commence par https://."],
+  };
+  const [title, message] = messages[name] || ['Microphone indisponible', "Une erreur technique a empêché l'accès au microphone. Réessayez ou importez un fichier audio."];
+  showMicrophoneGuidance({ title, message, retry: true });
+  audioStatus.classList.add('warn');
+  audioStatus.textContent = `Diagnostic : ${name}.`;
+}
+function chooseRecorderMimeType(){
+  if (typeof MediaRecorder.isTypeSupported !== 'function') return undefined;
+  return recorderMimeTypes.find(type => MediaRecorder.isTypeSupported(type));
+}
 
 /* Un micro muet produit un fichier parfaitement valide mais inaudible : on montre le
    niveau capté en direct et on prévient si rien n'a été enregistré. */
@@ -137,9 +188,6 @@ function stopMeter(){
   bars.forEach(bar => { bar.classList.remove('on'); bar.style.height = ''; });
 }
 
-const canRecord = Boolean(window.MediaRecorder && navigator.mediaDevices?.getUserMedia);
-if (!canRecord) { record.hidden = true; fallback.hidden = false; }
-
 const renderTime = () => {
   timer.textContent = `${String(Math.floor(elapsed / 60)).padStart(2, '0')}:${String(elapsed % 60).padStart(2, '0')}`;
 };
@@ -166,9 +214,13 @@ function showRecording(blob){
   };
   preview.onerror = () => {
     preview.hidden = true;
-    fallback.hidden = false;
+    showMicrophoneGuidance({
+      title: 'Lecture audio indisponible',
+      message: "Cette note ne peut pas être lue sur cet appareil. Vous pouvez l'enregistrer autrement puis importer le fichier audio.",
+      retry: false
+    });
     audioStatus.classList.add('warn');
-    audioStatus.textContent = 'Cette note n’est pas lisible sur cet appareil. Enregistrez-la avec votre téléphone puis envoyez le fichier audio ci-dessous.';
+    audioStatus.textContent = 'La note enregistrée ne peut pas être lue sur cet appareil.';
   };
   preview.src = previewUrl;
   preview.hidden = false;
@@ -188,13 +240,37 @@ function finishRecording(){
   pause.textContent = 'Mettre en pause';
 }
 
-record?.addEventListener('click', async () => {
+async function startRecording(){
+  if (!window.isSecureContext) {
+    const error = new DOMException('A secure context is required.', 'SecurityError');
+    logMicrophoneError('secure-context', error);
+    showMicrophoneError(error);
+    return;
+  }
+  if (!getUserMediaAvailable) {
+    showMicrophoneGuidance({
+      title: 'Enregistrement non disponible',
+      message: "Ce navigateur ne permet pas l'accès au microphone depuis cette page. Vous pouvez importer un fichier audio.",
+      retry: false
+    });
+    return;
+  }
+  if (!mediaRecorderAvailable) {
+    showMicrophoneGuidance({
+      title: 'Enregistrement non compatible',
+      message: "Le microphone est accessible, mais ce navigateur ne peut pas créer de fichier audio. Vous pouvez importer un fichier audio.",
+      retry: false
+    });
+    return;
+  }
   audioStatus.classList.remove('warn');
   audioStatus.textContent = 'Autorisation du microphone en cours…';
+  hideMicrophoneGuidance();
+  let stream;
   try {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } });
-    // isTypeSupported doit être appelée sur MediaRecorder, jamais détachée de son objet.
-    const mimeType = ['audio/mp4', 'audio/webm;codecs=opus', 'audio/webm', 'audio/ogg;codecs=opus'].find(type => MediaRecorder.isTypeSupported(type));
+    // Appelé exclusivement depuis le clic « Démarrer » ou « Réessayer ».
+    stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
+    const mimeType = chooseRecorderMimeType();
     const activeRecorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
     recorder = activeRecorder;
     const recordingChunks = [];
@@ -213,8 +289,7 @@ record?.addEventListener('click', async () => {
       audioStatus.textContent = `Note vocale prête à être envoyée (${timer.textContent}). Écoutez-la ci-dessous avant l’envoi.`;
       checkBlobAudio(blob);
     };
-    await startMeter(stream);
-    activeRecorder.start(1000);
+    activeRecorder.start();
     startTicker();
     record.hidden = true; pause.hidden = false; stop.hidden = false; dot.hidden = false;
     const track = stream.getAudioTracks()[0];
@@ -222,19 +297,43 @@ record?.addEventListener('click', async () => {
     audioStatus.textContent = micLabel
       ? `Enregistrement en cours sur « ${micLabel} ». Parlez normalement, à environ vingt centimètres du micro.`
       : 'Enregistrement en cours. Parlez normalement, à environ vingt centimètres du micro.';
+    // La jauge est facultative : son indisponibilité ne doit jamais interrompre l'enregistrement.
+    startMeter(stream).catch(error => logMicrophoneError('audio-meter', error));
   } catch (error) {
-    audioStatus.classList.add('warn');
-    audioStatus.textContent = error?.name === 'NotAllowedError'
-      ? 'L’accès au microphone a été refusé. Autorisez-le dans votre navigateur ou envoyez un fichier audio ci-dessous.'
-      : 'L’enregistrement n’est pas disponible sur cet appareil. Envoyez un fichier audio ci-dessous.';
-    fallback.hidden = false;
+    stream?.getTracks().forEach(track => track.stop());
+    logMicrophoneError('get-user-media-or-recorder', error);
+    showMicrophoneError(error);
     record.hidden = false;
   }
+}
+
+if (!getUserMediaAvailable || !mediaRecorderAvailable) {
+  record.hidden = true;
+  showMicrophoneGuidance({
+    title: 'Enregistrement non disponible',
+    message: !getUserMediaAvailable
+      ? "Ce navigateur ne permet pas l'accès au microphone depuis cette page. Vous pouvez importer un fichier audio."
+      : "Ce navigateur ne peut pas créer de fichier audio. Vous pouvez importer un fichier audio.",
+    retry: false
+  });
+}
+record?.addEventListener('click', startRecording);
+retryMicrophone?.addEventListener('click', startRecording);
+microphoneHelp?.addEventListener('click', () => {
+  const expanded = microphoneHelp.getAttribute('aria-expanded') === 'true';
+  microphoneHelp.setAttribute('aria-expanded', String(!expanded));
+  microphoneInstructions.hidden = expanded;
 });
 pause?.addEventListener('click', () => {
   if (!recorder) return;
-  if (recorder.state === 'recording') { recorder.pause(); clearInterval(ticker); pause.textContent = 'Reprendre'; dot.hidden = true; level.hidden = true; audioStatus.textContent = 'Enregistrement en pause.'; }
-  else { recorder.resume(); startTicker(); pause.textContent = 'Mettre en pause'; dot.hidden = false; level.hidden = false; audioStatus.textContent = 'Enregistrement en cours.'; }
+  try {
+    if (recorder.state === 'recording') { recorder.pause(); clearInterval(ticker); pause.textContent = 'Reprendre'; dot.hidden = true; level.hidden = true; audioStatus.textContent = 'Enregistrement en pause.'; }
+    else if (recorder.state === 'paused') { recorder.resume(); startTicker(); pause.textContent = 'Mettre en pause'; dot.hidden = false; level.hidden = false; audioStatus.textContent = 'Enregistrement en cours.'; }
+  } catch (error) {
+    logMicrophoneError('pause-resume', error);
+    audioStatus.classList.add('warn');
+    audioStatus.textContent = 'La mise en pause n’est pas disponible sur cet appareil. Vous pouvez terminer puis écouter la note.';
+  }
 });
 stop?.addEventListener('click', finishRecording);
 removeAudio?.addEventListener('click', () => {
@@ -249,6 +348,7 @@ audioFile?.addEventListener('change', () => {
   if (file.size > MAX_FILE_BYTES) { audioStatus.classList.add('warn'); audioStatus.textContent = `${file.name} dépasse la limite de 10 Mo.`; audioFile.value = ''; return; }
   audio = { blob: file, duration: 0 };
   audioStatus.classList.remove('warn');
+  audioFileName.textContent = file.name;
   audioStatus.textContent = `${file.name} sera envoyé comme note vocale.`;
 });
 

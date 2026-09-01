@@ -49,6 +49,12 @@ const upload = multer({
 const fail = (res, status, error) => res.status(status).json({ error });
 
 app.set('trust proxy', 1);
+// Le microphone ne doit être disponible que pour cette origine, jamais pour une page qui embarquerait le site.
+app.use((_req, res, next) => {
+  res.setHeader('Permissions-Policy', 'microphone=(self)');
+  res.setHeader('X-Frame-Options', 'DENY');
+  next();
+});
 app.use('/api', rateLimit({ windowMs: 15 * 60 * 1000, max: 10, standardHeaders: true, legacyHeaders: false, message: { error: 'Trop de tentatives depuis cet appareil. Réessayez dans quelques minutes.' } }));
 
 app.post('/api/contributions', (req, res) => {

@@ -7,23 +7,23 @@
     <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
     <meta name="theme-color" content="#06265c" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="canonical" href="https://dialoguenatinale.cd/participer" />
+    <link rel="canonical" href="https://dialoguenational.cd/participer" />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="fr_CD" />
     <meta property="og:site_name" content="Congo Dialogue" />
-    <meta property="og:url" content="https://dialoguenatinale.cd/participer" />
+    <meta property="og:url" content="https://dialoguenational.cd/participer" />
     <meta property="og:title" content="Déposer une contribution — Congo Dialogue" />
     <meta property="og:description" content="Formulaire officiel de dépôt d'une contribution au Dialogue national." />
-    <meta property="og:image" content="https://dialoguenatinale.cd/assets/hero.jpg" />
+    <meta property="og:image" content="https://dialoguenational.cd/assets/hero.jpg" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Déposer une contribution — Congo Dialogue" />
     <meta name="twitter:description" content="Contribuez au Dialogue national par écrit, note vocale ou document." />
-    <meta name="twitter:image" content="https://dialoguenatinale.cd/assets/hero.jpg" />
+    <meta name="twitter:image" content="https://dialoguenational.cd/assets/hero.jpg" />
     <title>Déposer une contribution — Congo Dialogue</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&family=Public+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet" />
-    <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Déposer une contribution au Dialogue national","url":"https://dialoguenatinale.cd/participer","inLanguage":"fr-CD","isPartOf":{"@id":"https://dialoguenatinale.cd/#website"}}</script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Déposer une contribution au Dialogue national","url":"https://dialoguenational.cd/participer","inLanguage":"fr-CD","isPartOf":{"@id":"https://dialoguenational.cd/#website"}}</script>
   </head>
   <body>
     <a class="skip" href="#formulaire">Aller au formulaire</a>
@@ -135,9 +135,24 @@
               <audio id="audio-preview" controls preload="metadata" hidden></audio>
               <p><button type="button" id="remove-audio" class="btn-sm quiet" hidden>Supprimer et recommencer</button></p>
               <p id="audio-status" class="field-help" role="status"></p>
-              <p id="audio-fallback" class="field-help" hidden>Votre navigateur ne permet pas l'enregistrement depuis cette page. Vous pouvez enregistrer la note avec l'application de votre téléphone puis l'envoyer ici :
-                <label class="field" style="margin-top:8px"><input id="audio-file" type="file" accept="audio/*" /></label>
-              </p>
+              <section id="microphone-guidance" class="mic-guidance" role="status" hidden>
+                <h4 id="microphone-title">Microphone non autorisé</h4>
+                <p id="microphone-message">Autorisez le microphone dans les réglages Safari pour enregistrer votre note.</p>
+                <div class="mic-actions">
+                  <button type="button" id="retry-microphone" class="btn-sm">Réessayer</button>
+                  <button type="button" id="microphone-help" class="btn-sm quiet" aria-expanded="false" aria-controls="microphone-instructions">Comment l'autoriser ?</button>
+                </div>
+                <div id="microphone-instructions" class="mic-instructions" hidden>
+                  <p><strong>Sur iPhone / Safari :</strong> ouvrez le menu <strong>aA</strong> dans la barre d'adresse, puis <strong>Réglages du site web</strong> → <strong>Microphone</strong> → <strong>Autoriser</strong>. Revenez ensuite ici et choisissez « Réessayer ».</p>
+                  <p>Si nécessaire, ouvrez <strong>Réglages iPhone</strong> → <strong>Safari</strong> → <strong>Microphone</strong> et choisissez <strong>Autoriser</strong>.</p>
+                </div>
+              </section>
+              <div class="audio-import">
+                <p>Vous préférez enregistrer autrement ?</p>
+                <label for="audio-file" class="btn-sm">Importer un fichier audio</label>
+                <input id="audio-file" type="file" accept="audio/*" />
+                <span id="audio-file-name" class="field-help" aria-live="polite"></span>
+              </div>
             </section>
 
             <section class="method">

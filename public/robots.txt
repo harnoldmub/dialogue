@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://dialoguenatinale.cd/sitemap.xml
+Sitemap: https://dialoguenational.cd/sitemap.xml
