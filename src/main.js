@@ -61,6 +61,36 @@ if (statement) {
   wordObserver.observe(statement);
 }
 
+/* Assistant local — guide le dépôt sans envoyer les questions à un service tiers. */
+const chatbot = document.querySelector('#dialogue-assistant');
+const chatbotLaunch = document.querySelector('.chatbot-launch');
+if (chatbot && chatbotLaunch) {
+  const chatMessages = chatbot.querySelector('.chatbot-messages');
+  const chatForm = chatbot.querySelector('.chatbot-form');
+  const chatInput = chatbot.querySelector('input');
+  const addChatMessage = (text, visitor = false) => {
+    const message = document.createElement('p');
+    message.textContent = text;
+    if (visitor) message.className = 'visitor';
+    chatMessages.append(message);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  };
+  const answer = question => {
+    const text = question.toLocaleLowerCase('fr-FR');
+    if (text.includes('format') || text.includes('document') || text.includes('vocal')) return 'Vous pouvez envoyer un texte, une note vocale ou un document PDF, DOC, DOCX, TXT, JPG ou PNG.';
+    if (text.includes('public') || text.includes('nom') || text.includes('confident')) return 'Les contributions ne sont pas publiées automatiquement. Les extraits utilisés dans les synthèses sont anonymisés.';
+    if (text.includes('pays') || text.includes('diaspora') || text.includes('province')) return 'La plateforme est accessible depuis la RDC comme depuis l’étranger. La province est demandée lorsque le pays de résidence est la RDC.';
+    if (text.includes('dépos') || text.includes('commen') || text.includes('particip')) return 'Choisissez une thématique puis déposez votre contribution par écrit, note vocale ou document. Aucun compte n’est nécessaire.';
+    return 'Je peux vous renseigner sur le dépôt, les formats acceptés, la confidentialité ou la participation depuis la diaspora.';
+  };
+  const openChat = () => { chatbot.hidden = false; chatbotLaunch.setAttribute('aria-expanded', 'true'); chatInput.focus(); };
+  const closeChat = () => { chatbot.hidden = true; chatbotLaunch.setAttribute('aria-expanded', 'false'); chatbotLaunch.focus(); };
+  chatbotLaunch.addEventListener('click', () => chatbot.hidden ? openChat() : closeChat());
+  chatbot.querySelector('.chatbot-close').addEventListener('click', closeChat);
+  chatbot.querySelectorAll('[data-chat-prompt]').forEach(button => button.addEventListener('click', () => { chatInput.value = button.dataset.chatPrompt; chatForm.requestSubmit(); }));
+  chatForm.addEventListener('submit', event => { event.preventDefault(); const question = chatInput.value.trim(); if (!question) return; addChatMessage(question, true); addChatMessage(answer(question)); chatInput.value = ''; });
+}
+
 /* Aperçu du parcours en modale — la page d'accueil n'est pas quittée. */
 const apercu = document.querySelector('#apercu');
 // Les liens gardent une destination réelle : sans script, ils mènent au formulaire.

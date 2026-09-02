@@ -152,29 +152,11 @@
         </div>
       </section>
 
-      <section class="section" id="participation">
-        <div class="wrap">
-          <div class="section-head reveal">
-            <div>
-              <h2>Quatre étapes, aucune inscription préalable.</h2>
-            </div>
-            <p>Vous n'avez pas besoin de créer un compte. Le formulaire tient sur une page et se termine par la remise d'une référence de suivi.</p>
-          </div>
-          <ol class="steps reveal">
-            <li><span>Étape 01</span><h3>Identifiez-vous</h3><p>Nom, adresse électronique et lieu de résidence, en RDC ou à l'étranger.</p></li>
-            <li><span>Étape 02</span><h3>Choisissez la thématique</h3><p>Quinze sujets sont ouverts. Ajoutez un titre si vous le souhaitez.</p></li>
-            <li><span>Étape 03</span><h3>Exprimez votre proposition</h3><p>Écrivez, enregistrez une note vocale ou joignez un document. Les trois sont possibles.</p></li>
-            <li><span>Étape 04</span><h3>Conservez votre référence</h3><p>Elle vous est remise dès l'envoi et identifie votre dépôt dans le traitement.</p></li>
-          </ol>
-          <p class="participation-action reveal"><a class="btn btn-primary" href="/participer">Commencer ma contribution <span class="arw" aria-hidden="true">→</span></a></p>
-        </div>
-      </section>
-
       <section class="section" id="documents">
         <div class="wrap">
           <div class="section-head reveal">
             <div>
-              <p class="eyebrow"><b>04</b> Documents et repères</p>
+              <p class="eyebrow"><b>03</b> Documents et repères</p>
               <h2>Les références du Dialogue national.</h2>
             </div>
             <p>Les documents officiels publiés à ce jour et les repères utiles pour préparer une contribution.</p>
@@ -222,6 +204,13 @@
           </div>
         </div>
       </section>
+      <section class="chatbot" id="dialogue-assistant" aria-label="Assistant du Dialogue national" hidden>
+        <div class="chatbot-head"><div><b>Assistant du Dialogue</b><span>Réponse immédiate</span></div><button class="chatbot-close" type="button" aria-label="Fermer l’assistant">×</button></div>
+        <div class="chatbot-messages" aria-live="polite"><p>Bonjour. Je peux vous aider à comprendre le dépôt d’une contribution.</p></div>
+        <div class="chatbot-prompts"><button type="button" data-chat-prompt="Comment déposer ?">Comment déposer ?</button><button type="button" data-chat-prompt="Quels formats ?">Quels formats ?</button><button type="button" data-chat-prompt="Ma contribution est-elle publique ?">Confidentialité</button></div>
+        <form class="chatbot-form"><label class="sr-only" for="chatbot-input">Votre question</label><input id="chatbot-input" name="question" placeholder="Écrivez votre question" autocomplete="off" /><button type="submit">Envoyer</button></form>
+      </section>
+      <button class="chatbot-launch" type="button" aria-expanded="false" aria-controls="dialogue-assistant"><span aria-hidden="true">◌</span> Besoin d’aide ?</button>
       <dialog id="apercu" class="notice-modal" aria-labelledby="apercu-title">
         <div class="notice-head">
           <h2 id="apercu-title">Comment se passe un dépôt</h2>
@@ -266,7 +255,6 @@
           <ul>
             <li><a href="/participer">Déposer une contribution</a></li>
             <li><a href="#thematiques">Thématiques</a></li>
-            <li><a href="#participation">Étapes du dépôt</a></li>
           </ul>
         </div>
         <div>
