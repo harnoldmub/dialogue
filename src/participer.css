@@ -111,7 +111,12 @@ audio{width:100%;max-width:420px;margin-top:16px}
   .form-aside{position:static;order:-1}
 }
 @media(max-width:760px){
-  .form-intro h1,.confirmation h1,.static-page h1{font-size:30px}
+  .breadcrumb{padding:12px 0}
+  .form-intro{padding:4px 0 24px}
+  .form-intro h1,.confirmation h1,.static-page h1{font-size:28px}
+  .form-intro .lead{margin-top:12px}
+  .form-layout{gap:24px;padding:24px 0 56px}
+  .form-aside{display:none}
   .fields{grid-template-columns:1fr}
   .form-step{padding:16px}
   .reference{font-size:20px}
