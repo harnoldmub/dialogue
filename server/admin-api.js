@@ -55,7 +55,7 @@ export function registerAdminApi(app, loginLimiter){
 
   app.get('/api/admin/dashboard', requireAdmin('analytics:read'), async (req,res)=>{
     const db=getDatabase(); const result=await db.query(`SELECT COUNT(*)::int total,COUNT(*) FILTER(WHERE status='RECEIVED')::int new,COUNT(*) FILTER(WHERE status IN ('IN_REVIEW','NEEDS_FOLLOW_UP'))::int processing,COUNT(*) FILTER(WHERE status='VALIDATED')::int validated,COUNT(*) FILTER(WHERE status='REJECTED')::int rejected,COUNT(*) FILTER(WHERE audio_key IS NOT NULL)::int audio,COUNT(*) FILTER(WHERE EXISTS(SELECT 1 FROM contribution_files f WHERE f.contribution_id=contributions.id))::int documents,COUNT(*) FILTER(WHERE country <> 'République démocratique du Congo')::int diaspora FROM contributions`);
-    const [themes,timeline]=await Promise.all([db.query('SELECT theme,COUNT(*)::int count FROM contributions GROUP BY theme ORDER BY count DESC'),db.query("SELECT to_char(created_at,'YYYY-MM-DD') day,COUNT(*)::int count FROM contributions WHERE created_at>=NOW()-INTERVAL '30 days' GROUP BY day ORDER BY day")]);
+    const [themes,timeline]=await Promise.all([db.query('SELECT theme,COUNT(*)::int count FROM contributions GROUP BY theme ORDER BY count DESC'),db.query("SELECT to_char(created_at,'YYYY-MM-DD') AS day,COUNT(*)::int count FROM contributions WHERE created_at>=NOW()-INTERVAL '30 days' GROUP BY 1 ORDER BY 1")]);
     res.json({kpi:result.rows[0],themes:themes.rows,timeline:timeline.rows});
   });
   app.get('/api/admin/contributions', requireAdmin('contributions:read'), async (req,res)=>{
