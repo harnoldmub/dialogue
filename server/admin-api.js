@@ -54,9 +54,14 @@ export function registerAdminApi(app, loginLimiter){
   app.get('/api/admin/me', async (req,res)=>{const user=await sessionUser(req);if(!user)return res.status(401).json({error:'Authentification requise.'});res.json({user:{id:user.id,email:user.email,displayName:user.display_name,role:user.role},csrfToken:user.csrf_token});});
 
   app.get('/api/admin/dashboard', requireAdmin('analytics:read'), async (req,res)=>{
-    const db=getDatabase(); const result=await db.query(`SELECT COUNT(*)::int total,COUNT(*) FILTER(WHERE status='RECEIVED')::int new,COUNT(*) FILTER(WHERE status IN ('IN_REVIEW','NEEDS_FOLLOW_UP'))::int processing,COUNT(*) FILTER(WHERE status='VALIDATED')::int validated,COUNT(*) FILTER(WHERE status='REJECTED')::int rejected,COUNT(*) FILTER(WHERE audio_key IS NOT NULL)::int audio,COUNT(*) FILTER(WHERE EXISTS(SELECT 1 FROM contribution_files f WHERE f.contribution_id=contributions.id))::int documents,COUNT(*) FILTER(WHERE country <> 'République démocratique du Congo')::int diaspora FROM contributions`);
-    const [themes,timeline]=await Promise.all([db.query('SELECT theme,COUNT(*)::int count FROM contributions GROUP BY theme ORDER BY count DESC'),db.query("SELECT to_char(created_at,'YYYY-MM-DD') AS day,COUNT(*)::int count FROM contributions WHERE created_at>=NOW()-INTERVAL '30 days' GROUP BY 1 ORDER BY 1")]);
-    res.json({kpi:result.rows[0],themes:themes.rows,timeline:timeline.rows});
+    const db=getDatabase(); const result=await db.query(`SELECT COUNT(*)::int total,COUNT(*) FILTER(WHERE status='RECEIVED')::int new,COUNT(*) FILTER(WHERE status IN ('IN_REVIEW','NEEDS_FOLLOW_UP'))::int processing,COUNT(*) FILTER(WHERE status='VALIDATED')::int validated,COUNT(*) FILTER(WHERE status='REJECTED')::int rejected,COUNT(*) FILTER(WHERE audio_key IS NOT NULL)::int audio,COUNT(*) FILTER(WHERE EXISTS(SELECT 1 FROM contribution_files f WHERE f.contribution_id=contributions.id))::int documents,COUNT(*) FILTER(WHERE country <> 'République démocratique du Congo')::int diaspora,COUNT(*) FILTER(WHERE read_at IS NULL)::int unread,COUNT(*) FILTER(WHERE assigned_to IS NULL)::int unassigned FROM contributions`);
+    const [themes,timeline,recent,provinces]=await Promise.all([
+      db.query('SELECT theme,COUNT(*)::int count FROM contributions GROUP BY theme ORDER BY count DESC'),
+      db.query("SELECT to_char(created_at,'YYYY-MM-DD') AS day,COUNT(*)::int count FROM contributions WHERE created_at>=NOW()-INTERVAL '30 days' GROUP BY 1 ORDER BY 1"),
+      db.query('SELECT id,reference,created_at,first_name,last_name,theme,country,status,read_at FROM contributions ORDER BY created_at DESC LIMIT 8'),
+      db.query("SELECT COALESCE(NULLIF(province,''),'Non précisée') AS province,COUNT(*)::int count FROM contributions WHERE country='République démocratique du Congo' GROUP BY 1 ORDER BY count DESC LIMIT 10")
+    ]);
+    res.json({kpi:result.rows[0],themes:themes.rows,timeline:timeline.rows,recent:recent.rows,provinces:provinces.rows});
   });
   app.get('/api/admin/contributions', requireAdmin('contributions:read'), async (req,res)=>{
     const db=getDatabase();const {where,values}=queryFilters(req.query);const page=Math.max(1,Number(req.query.page)||1),limit=Math.min(100,Math.max(10,Number(req.query.limit)||25)),order=safeOrder[req.query.sort]||safeOrder.created_at,dir=req.query.dir==='asc'?'ASC':'DESC';
@@ -85,6 +90,76 @@ export function registerAdminApi(app, loginLimiter){
   app.post('/api/admin/summaries', requireAdmin('summaries:write'), async(req,res)=>{const parsed=z.object({title:z.string().min(3).max(240),body:z.string().max(50000),theme:z.string().max(100).optional(),contributionIds:z.array(z.string().uuid()).max(1000).default([])}).safeParse(req.body);if(!parsed.success)return res.status(400).json({error:'Synthèse invalide.'});const db=getDatabase();const summary=await db.query('INSERT INTO summaries(title,body,theme,created_by) VALUES($1,$2,$3,$4) RETURNING *',[parsed.data.title,parsed.data.body,parsed.data.theme||null,req.adminUser.id]);for(const id of parsed.data.contributionIds)await db.query('INSERT INTO summary_contributions(summary_id,contribution_id) VALUES($1,$2) ON CONFLICT DO NOTHING',[summary.rows[0].id,id]);await audit(req.adminUser,'SUMMARY_CREATED','summary',summary.rows[0].id,req);res.status(201).json(summary.rows[0]);});
   app.get('/api/admin/users', requireAdmin('*'), async(_req,res)=>res.json((await getDatabase().query('SELECT id,email,display_name,role,active,last_login_at,created_at FROM admin_users ORDER BY created_at')).rows.map(userView)));
   app.post('/api/admin/users', requireAdmin('*'), async(req,res)=>{const parsed=z.object({email:z.string().email(),displayName:z.string().min(2).max(120),password:z.string().min(16).max(1024),role:z.enum(ROLES)}).safeParse(req.body);if(!parsed.success)return res.status(400).json({error:'Utilisateur invalide (mot de passe : 16 caractères minimum).'});const user=await getDatabase().query('INSERT INTO admin_users(email,display_name,password_hash,role) VALUES($1,$2,$3,$4) RETURNING id,email,display_name,role,active,last_login_at,created_at',[parsed.data.email.toLowerCase(),parsed.data.displayName,await hashPassword(parsed.data.password),parsed.data.role]);await audit(req.adminUser,'USER_CREATED','user',user.rows[0].id,req,{role:parsed.data.role});res.status(201).json(userView(user.rows[0]));});
-  app.get('/api/admin/audit', requireAdmin('*'), async(req,res)=>{const rows=await getDatabase().query('SELECT a.*,u.display_name,u.email FROM audit_logs a LEFT JOIN admin_users u ON u.id=a.user_id ORDER BY a.created_at DESC LIMIT 200');res.json(rows.rows);});
+  app.get('/api/admin/audit', requireAdmin('*'), async(req,res)=>{
+    const db=getDatabase();const page=Math.max(1,Number(req.query.page)||1),limit=Math.min(200,Math.max(10,Number(req.query.limit)||50));
+    const filters=[];const values=[];if(req.query.action){values.push(String(req.query.action).slice(0,60));filters.push(`a.action=$${values.length}`);}
+    const where=filters.length?`WHERE ${filters.join(' AND ')}`:'';
+    const [count,rows,actions]=await Promise.all([
+      db.query(`SELECT COUNT(*)::int count FROM audit_logs a ${where}`,values),
+      db.query(`SELECT a.*,u.display_name,u.email FROM audit_logs a LEFT JOIN admin_users u ON u.id=a.user_id ${where} ORDER BY a.created_at DESC LIMIT ${limit} OFFSET ${(page-1)*limit}`,values),
+      db.query('SELECT DISTINCT action FROM audit_logs ORDER BY action')
+    ]);
+    res.json({items:rows.rows,page,limit,total:count.rows[0].count,actions:actions.rows.map(r=>r.action)});
+  });
+  app.get('/api/admin/filters', requireAdmin('contributions:read'), async(_req,res)=>{
+    const db=getDatabase();
+    const [themes,countries,provinces,users,tags]=await Promise.all([
+      db.query('SELECT DISTINCT theme FROM contributions ORDER BY theme'),
+      db.query('SELECT DISTINCT country FROM contributions ORDER BY country'),
+      db.query("SELECT DISTINCT province FROM contributions WHERE COALESCE(province,'') <> '' ORDER BY province"),
+      db.query('SELECT id,display_name,role FROM admin_users WHERE active=true ORDER BY display_name'),
+      db.query('SELECT id,name,color FROM admin_tags WHERE active=true ORDER BY name')
+    ]);
+    res.json({statuses:STATUSES,themes:themes.rows.map(r=>r.theme),countries:countries.rows.map(r=>r.country),provinces:provinces.rows.map(r=>r.province),users:users.rows.map(r=>({id:r.id,displayName:r.display_name,role:r.role})),tags:tags.rows});
+  });
+  app.post('/api/admin/contributions/bulk', requireAdmin('contributions:write'), async(req,res)=>{
+    const parsed=z.object({ids:z.array(z.string().uuid()).min(1).max(200),status:z.enum(STATUSES).optional(),priority:z.number().int().min(0).max(3).optional(),assignedTo:z.string().uuid().nullable().optional()}).safeParse(req.body);
+    if(!parsed.success)return res.status(400).json({error:'Sélection ou action invalide.'});
+    const {ids,status,priority,assignedTo}=parsed.data;
+    if(status===undefined&&priority===undefined&&assignedTo===undefined)return res.status(400).json({error:'Choisissez une action à appliquer.'});
+    const db=getDatabase();const before=await db.query('SELECT id,status FROM contributions WHERE id = ANY($1::uuid[])',[ids]);
+    const fields=[];const values=[ids];const set=(column,value)=>{values.push(value);fields.push(`${column}=$${values.length}`);};
+    if(status!==undefined)set('status',status);if(priority!==undefined)set('priority',priority);if(assignedTo!==undefined)set('assigned_to',assignedTo);
+    await db.query(`UPDATE contributions SET ${fields.join(',')},updated_at=NOW() WHERE id = ANY($1::uuid[])`,values);
+    for(const row of before.rows){
+      if(status&&status!==row.status)await db.query('INSERT INTO contribution_status_history(contribution_id,from_status,to_status,changed_by) VALUES($1,$2,$3,$4)',[row.id,row.status,status,req.adminUser.id]);
+      if(assignedTo!==undefined)await db.query('INSERT INTO contribution_assignments(contribution_id,assigned_to,assigned_by) VALUES($1,$2,$3)',[row.id,assignedTo,req.adminUser.id]);
+    }
+    await audit(req.adminUser,'CONTRIBUTIONS_BULK_UPDATED','contribution',null,req,{count:before.rowCount,status,priority,assignedTo});
+    res.json({updated:before.rowCount});
+  });
+  app.get('/api/admin/summaries/:id', requireAdmin('summaries:write'), async(req,res)=>{
+    const db=getDatabase();
+    const summary=await db.query('SELECT s.*,u.display_name FROM summaries s LEFT JOIN admin_users u ON u.id=s.created_by WHERE s.id=$1',[req.params.id]);
+    if(!summary.rowCount)return res.status(404).json({error:'Synthèse introuvable.'});
+    const linked=await db.query('SELECT c.id,c.reference,c.theme,c.country,c.status FROM summary_contributions sc JOIN contributions c ON c.id=sc.contribution_id WHERE sc.summary_id=$1 ORDER BY c.created_at DESC',[req.params.id]);
+    res.json({...summary.rows[0],contributions:linked.rows});
+  });
+  app.patch('/api/admin/summaries/:id', requireAdmin('summaries:write'), async(req,res)=>{
+    const parsed=z.object({title:z.string().min(3).max(240).optional(),body:z.string().max(50000).optional(),theme:z.string().max(100).nullable().optional(),status:z.enum(['DRAFT','REVIEW','PUBLISHED']).optional(),contributionIds:z.array(z.string().uuid()).max(1000).optional()}).safeParse(req.body);
+    if(!parsed.success)return res.status(400).json({error:'Synthèse invalide.'});
+    const db=getDatabase();const data=parsed.data;const fields=[];const values=[req.params.id];const set=(column,value)=>{values.push(value);fields.push(`${column}=$${values.length}`);};
+    if(data.title!==undefined)set('title',data.title);if(data.body!==undefined)set('body',data.body);if(data.theme!==undefined)set('theme',data.theme);if(data.status!==undefined)set('status',data.status);
+    if(fields.length){const updated=await db.query(`UPDATE summaries SET ${fields.join(',')},updated_at=NOW() WHERE id=$1 RETURNING id`,values);if(!updated.rowCount)return res.status(404).json({error:'Synthèse introuvable.'});}
+    if(data.contributionIds){await db.query('DELETE FROM summary_contributions WHERE summary_id=$1',[req.params.id]);for(const id of data.contributionIds)await db.query('INSERT INTO summary_contributions(summary_id,contribution_id) VALUES($1,$2) ON CONFLICT DO NOTHING',[req.params.id,id]);}
+    await audit(req.adminUser,'SUMMARY_UPDATED','summary',req.params.id,req,data);
+    res.status(204).end();
+  });
+  app.patch('/api/admin/users/:id', requireAdmin('*'), async(req,res)=>{
+    const parsed=z.object({displayName:z.string().min(2).max(120).optional(),role:z.enum(ROLES).optional(),active:z.boolean().optional(),password:z.string().min(16).max(1024).optional()}).safeParse(req.body);
+    if(!parsed.success)return res.status(400).json({error:'Modification invalide (mot de passe : 16 caractères minimum).'});
+    const data=parsed.data;
+    // Un super administrateur ne peut pas se retirer lui-même l'accès : la plateforme resterait sans pilote.
+    if(req.params.id===req.adminUser.id&&(data.active===false||(data.role&&data.role!=='SUPER_ADMIN')))return res.status(400).json({error:'Vous ne pouvez pas retirer votre propre accès.'});
+    const db=getDatabase();const fields=[];const values=[req.params.id];const set=(column,value)=>{values.push(value);fields.push(`${column}=$${values.length}`);};
+    if(data.displayName!==undefined)set('display_name',data.displayName);if(data.role!==undefined)set('role',data.role);if(data.active!==undefined)set('active',data.active);
+    if(data.password!==undefined)set('password_hash',await hashPassword(data.password));
+    if(!fields.length)return res.status(400).json({error:'Aucune modification demandée.'});
+    const updated=await db.query(`UPDATE admin_users SET ${fields.join(',')} WHERE id=$1 RETURNING id,email,display_name,role,active,last_login_at,created_at`,values);
+    if(!updated.rowCount)return res.status(404).json({error:'Utilisateur introuvable.'});
+    if(data.active===false||data.password)await db.query('DELETE FROM admin_sessions WHERE user_id=$1',[req.params.id]);
+    await audit(req.adminUser,'USER_UPDATED','user',req.params.id,req,{role:data.role,active:data.active,passwordChanged:Boolean(data.password)});
+    res.json(userView(updated.rows[0]));
+  });
   app.get('/api/admin/exports/contributions.csv', requireAdmin('exports:run'), async(req,res)=>{const db=getDatabase();const {where,values}=queryFilters(req.query);const rows=await db.query(`SELECT c.reference,c.created_at,c.first_name,c.last_name,c.email,c.country,c.province,c.profile,c.theme,c.status,c.priority FROM contributions c ${where} ORDER BY c.created_at DESC LIMIT 10000`,values);res.setHeader('Content-Type','text/csv; charset=utf-8');res.setHeader('Content-Disposition','attachment; filename="contributions.csv"');res.write('\ufeffRéférence,Date,Prénom,Nom,Email,Pays,Province,Profil,Thématique,Statut,Priorité\n');for(const row of rows.rows)res.write([row.reference,row.created_at,row.first_name,row.last_name,row.email,row.country,row.province,row.profile,row.theme,row.status,row.priority].map(csv).join(',')+'\n');await audit(req.adminUser,'EXPORT_CSV','contribution',null,req,{count:rows.rows.length});res.end();});
 }

@@ -58,8 +58,8 @@ app.use((_req, res, next) => {
   next();
 });
 app.use(express.json({ limit: '1mb' }));
-const publicContributionLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 10, standardHeaders: true, legacyHeaders: false, message: { error: 'Trop de tentatives depuis cet appareil. Réessayez dans quelques minutes.' } });
-const adminLoginLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 5, standardHeaders: true, legacyHeaders: false, message: { error: 'Trop de tentatives. Réessayez dans quelques minutes.' } });
+const publicContributionLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: Number(process.env.PUBLIC_RATE_LIMIT_MAX || 10), standardHeaders: true, legacyHeaders: false, message: { error: 'Trop de tentatives depuis cet appareil. Réessayez dans quelques minutes.' } });
+const adminLoginLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: Number(process.env.ADMIN_LOGIN_RATE_LIMIT_MAX || 5), standardHeaders: true, legacyHeaders: false, message: { error: 'Trop de tentatives. Réessayez dans quelques minutes.' } });
 registerAdminApi(app, adminLoginLimiter);
 
 app.post('/api/contributions', publicContributionLimiter, (req, res) => {
