@@ -94,7 +94,7 @@ const retryMicrophone = document.querySelector('#retry-microphone');
 const microphoneHelp = document.querySelector('#microphone-help');
 const microphoneInstructions = document.querySelector('#microphone-instructions');
 const bars = [...level.querySelectorAll('b i')];
-let recorder = null, elapsed = 0, ticker = null, previewUrl = null;
+let recorder = null, elapsed = 0, ticker = null, previewUrl = null, isFinalizing = false;
 let audioContext = null, meter = null, peak = 0, startedAt = 0, silentWarned = false, micLabel = '';
 
 const getUserMediaAvailable = Boolean(navigator.mediaDevices?.getUserMedia);
@@ -140,6 +140,17 @@ function showMicrophoneError(error){
 function chooseRecorderMimeType(){
   if (typeof MediaRecorder.isTypeSupported !== 'function') return undefined;
   return recorderMimeTypes.find(type => MediaRecorder.isTypeSupported(type));
+}
+function logRecorderDiagnostic(activeRecorder, recordingChunks, stream, finalBlob = null){
+  console.log('[Voice recorder] finalisation', {
+    recorderState: activeRecorder.state,
+    mimeType: activeRecorder.mimeType,
+    chunks: recordingChunks.length,
+    chunkSizes: recordingChunks.map(chunk => chunk.size),
+    blobSize: finalBlob?.size ?? null,
+    streamActive: stream.active,
+    audioTracks: stream.getAudioTracks().map(track => ({ enabled: track.enabled, muted: track.muted, readyState: track.readyState }))
+  });
 }
 
 /* Un micro muet produit un fichier parfaitement valide mais inaudible : on montre le
@@ -231,16 +242,24 @@ function showRecording(blob){
   preview.load();
 }
 function finishRecording(){
+  if (!recorder || recorder.state === 'inactive' || isFinalizing) return;
+  isFinalizing = true;
   clearInterval(ticker);
-  stopMeter();
-  if (recorder && recorder.state !== 'inactive') {
-    // Le dernier fragment peut ne pas être émis avant stop(), surtout sur Safari/iOS.
-    try { recorder.requestData(); } catch { /* l'enregistreur est déjà en arrêt */ }
-    recorder.stop();
+  // Safari/iOS finalise le dernier fragment à stop(). Ne pas appeler requestData() juste avant :
+  // cette course pouvait laisser le tampon final vide sur certains appareils.
+  try { recorder.stop(); }
+  catch (error) {
+    isFinalizing = false;
+    logMicrophoneError('recorder-stop', error);
+    audioStatus.classList.add('warn');
+    audioStatus.textContent = "L'enregistrement n'a pas pu être finalisé. Réessayez.";
+    return;
   }
-  record.hidden = false; record.textContent = 'Enregistrer une nouvelle version';
+  record.hidden = true;
   pause.hidden = true; stop.hidden = true; dot.hidden = true;
   pause.textContent = 'Mettre en pause';
+  audioStatus.classList.remove('warn');
+  audioStatus.textContent = 'Finalisation de votre note vocale…';
 }
 
 async function startRecording(){
@@ -278,18 +297,34 @@ async function startRecording(){
     recorder = activeRecorder;
     const recordingChunks = [];
     elapsed = 0; renderTime();
-    activeRecorder.ondataavailable = event => { if (event.data.size) recordingChunks.push(event.data); };
-    activeRecorder.onstop = () => {
-      stream.getTracks().forEach(track => track.stop());
+    activeRecorder.ondataavailable = event => {
+      if (event.data && event.data.size > 0) recordingChunks.push(event.data);
+      console.log('[Voice recorder] dataavailable', { size: event.data?.size || 0, type: event.data?.type || activeRecorder.mimeType, chunks: recordingChunks.length });
+    };
+    activeRecorder.onstop = async () => {
+      // Safari peut émettre le dernier dataavailable à la fin de la file d'événements de stop.
+      await new Promise(resolve => setTimeout(resolve, 120));
       // Le type du fragment est la source fiable : recorder.mimeType peut être vide sur iOS.
       const recordedType = recordingChunks.find(chunk => chunk.type)?.type || activeRecorder.mimeType || mimeType || 'audio/webm';
       const blob = new Blob(recordingChunks, { type: recordedType });
-      if (!blob.size) { audioStatus.classList.add('warn'); audioStatus.textContent = 'Aucun son n’a été capté. Vérifiez votre microphone puis recommencez.'; return; }
+      logRecorderDiagnostic(activeRecorder, recordingChunks, stream, blob);
+      // Les tracks restent vivantes jusqu'ici : elles ne doivent jamais être arrêtées avant le Blob final.
+      stopMeter();
+      stream.getTracks().forEach(track => track.stop());
+      recorder = null;
+      isFinalizing = false;
+      record.hidden = false;
+      record.textContent = 'Enregistrer une nouvelle version';
+      if (!blob.size) {
+        audioStatus.classList.add('warn');
+        audioStatus.textContent = "Le navigateur n'a pas finalisé le fichier audio. Le microphone a bien été détecté ; recommencez l'enregistrement.";
+        return;
+      }
       audio = { blob, duration: elapsed };
       showRecording(blob);
       removeAudio.hidden = false;
       audioStatus.classList.remove('warn');
-      audioStatus.textContent = `Note vocale prête à être envoyée (${timer.textContent}). Écoutez-la ci-dessous avant l’envoi.`;
+      audioStatus.textContent = `Votre note vocale — ${timer.textContent}. Écoutez-la avant l’envoi.`;
       checkBlobAudio(blob);
     };
     activeRecorder.start();
@@ -366,7 +401,9 @@ async function checkBlobAudio(blob){
       for (let i = 0; i < data.length; i += 64) max = Math.max(max, Math.abs(data[i]));
     }
     context.close();
-    if (max < 0.005) {
+    // La jauge et le recorder reçoivent le même MediaStream. Si la jauge a capté du son,
+    // un décodage Safari incomplet ne doit pas faire passer la note pour silencieuse.
+    if (max < 0.005 && peak < 0.008) {
       audioStatus.classList.add('warn');
       audioStatus.textContent = `La note enregistrée est silencieuse${micLabel ? ` : « ${micLabel} » n’a transmis aucun son` : ''}. Vérifiez l’entrée micro et son volume dans les réglages de votre appareil, puis recommencez.`;
     }
