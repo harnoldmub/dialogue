@@ -16,6 +16,23 @@ nav?.querySelectorAll('a').forEach(link => link.addEventListener('click', () => 
   menu?.setAttribute('aria-expanded', 'false');
 }));
 
+/* Thématiques — accordéon compact sur téléphone, toutes les fiches restent visibles sur grand écran. */
+const themes = document.querySelector('.themes');
+const themeDetails = themes ? [...themes.querySelectorAll('details')] : [];
+const compactThemes = window.matchMedia('(max-width: 760px)');
+const syncThemeAccordion = () => {
+  if (compactThemes.matches) themeDetails.forEach((item, index) => { item.open = index === 0; });
+  else themeDetails.forEach(item => { item.open = true; });
+};
+if (themeDetails.length) {
+  syncThemeAccordion();
+  compactThemes.addEventListener('change', syncThemeAccordion);
+  themeDetails.forEach(item => item.addEventListener('toggle', () => {
+    if (!compactThemes.matches || !item.open) return;
+    themeDetails.forEach(other => { if (other !== item) other.open = false; });
+  }));
+}
+
 /* Révélations d'entrée — discrètes, une seule fois par élément. */
 const reveal = new IntersectionObserver((entries, self) => entries.forEach(entry => {
   if (!entry.isIntersecting) return;
