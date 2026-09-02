@@ -222,6 +222,7 @@ ul,ol{margin:0;padding:0;list-style:none}
 }
 @media(max-width:760px){
   html,body{width:100%}
+  .wrap,.section,main,.themes,.themes li,.themes details,.themes summary,.themes h3,.themes p{min-width:0;max-width:100%}
   .brand-logo{height:34px;max-width:150px}
   .footer-grid .brand-logo{height:42px;max-width:180px}
   html{scroll-padding-top:80px}
@@ -243,7 +244,7 @@ ul,ol{margin:0;padding:0;list-style:none}
   .main-nav a[href="/participer"]::after{content:"→";font-size:20px;line-height:1}
   .main-nav a[href="/participer"]:hover{background:var(--blue-mid);color:#fff}
   .figures,.themes,.journey,.steps{grid-template-columns:1fr}
-  .themes summary{padding:18px 20px}.themes p{padding:0 20px 18px}
+  .themes summary{padding:18px 20px}.themes p{padding:0 20px 18px;overflow-wrap:anywhere}
   .figures li{border-right:0;border-bottom:1px solid var(--line)}
   .figures li:last-child{border-bottom:0}
   .docs li a{grid-template-columns:1fr;gap:8px}
