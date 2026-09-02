@@ -112,7 +112,7 @@ function shell(){
   const items = VIEWS.filter(view => !view.superAdmin || canSuperAdmin());
   app.innerHTML = `<div class="shell">
     <aside class="sidebar">
-      <div class="brand">République démocratique du Congo<strong>Dialogue national</strong></div>
+      <a class="brand" href="/" aria-label="Dialogue national, accueil"><img class="admin-logo" src="/assets/logo-dialogue-national.png" width="320" height="88" alt="Dialogue national" /></a>
       <nav class="nav" aria-label="Sections de l’administration">${items.map(view => `<a href="#/${view.route}" data-route="${view.route}">${view.label}</a>`).join('')}</nav>
       <p class="sidebar-foot">Espace sécurisé · <a href="/" target="_blank" rel="noopener">Voir le site</a></p>
     </aside>

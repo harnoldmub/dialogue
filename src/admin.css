@@ -4,7 +4,7 @@
 /* — Cadre applicatif — */
 .shell{display:grid;grid-template-columns:252px minmax(0,1fr);min-height:100vh}
 .sidebar{display:flex;flex-direction:column;background:#06265c;color:#eaf1fb;padding:20px 14px}
-.brand{padding:8px 10px 28px;font:500 11px "Geist Mono",monospace;letter-spacing:.1em;text-transform:uppercase}
+.brand{padding:8px 10px 28px}.admin-logo{display:block;width:auto;height:42px;max-width:190px;object-fit:contain}
 .brand strong{display:block;margin-top:4px;color:#fff;font:700 18px "Public Sans",sans-serif;letter-spacing:-.02em;text-transform:none}
 .nav{display:grid;gap:3px}
 .nav a{display:block;border-radius:6px;padding:11px;color:#c3d2e8;font-size:14px;text-decoration:none;transition:background .2s,color .2s}
@@ -162,7 +162,7 @@ audio{width:100%;margin-bottom:12px}
   .login-card{width:100%;padding:38px 28px}.login-card h1{font-size:31px}
   .shell{grid-template-columns:1fr}
   .sidebar{display:block;padding:10px}
-  .brand{padding:6px 10px 10px}
+  .brand{padding:6px 10px 10px}.admin-logo{height:34px;max-width:154px}
   .nav{display:flex;overflow-x:auto;overflow-y:hidden;gap:6px;overscroll-behavior-x:contain}
   .nav a{white-space:nowrap}
   .sidebar-foot{display:none}
