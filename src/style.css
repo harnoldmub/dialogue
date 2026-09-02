@@ -248,7 +248,10 @@ ul,ol{margin:0;padding:0;list-style:none}
   .figures li{border-right:0;border-bottom:1px solid var(--line)}
   .figures li:last-child{border-bottom:0}
   .docs li a{grid-template-columns:1fr;gap:8px}
-  .footer-grid{grid-template-columns:1fr;gap:44px;padding:64px 0 56px}
+  .site-footer{overflow-x:hidden}
+  .site-footer .wrap{padding-left:max(28px,env(safe-area-inset-left));padding-right:max(28px,env(safe-area-inset-right))}
+  .footer-grid{grid-template-columns:minmax(0,1fr);gap:44px;padding:64px 0 56px}
+  .footer-grid>div,.footer-grid .about,.footer-bottom span{min-width:0;max-width:100%;overflow-wrap:anywhere}
   .footer-grid h3{margin-bottom:20px}
   .footer-grid ul{gap:14px}
   .footer-bottom{gap:12px;padding:24px 0 28px;line-height:1.55}
