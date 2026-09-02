@@ -25,7 +25,7 @@ function setupCountrySearch(){
   const names={CD:'République démocratique du Congo',CG:'République du Congo',CI:"Côte d’Ivoire",CZ:'Tchéquie',PS:'Palestine',XK:'Kosovo'};
   const countries=COUNTRY_CODES.map(code=>({code,name:names[code]||labels?.of(code)||code,flag:flagFor(code),search:code==='CD'?'RDC DRC Democratic Republic of the Congo':code})).sort((a,b)=>a.name.localeCompare(b.name,'fr'));
   const choose=country=>{input.value=country.name;input.dataset.countryCode=country.code;flag.textContent=country.flag||'🌐';results.hidden=true;toggleProvince()};
-  const render=(query=input.value)=>{const term=normalise(query);const matches=countries.filter(country=>normalise(`${country.name} ${country.search}`).includes(term));results.innerHTML='';matches.forEach(country=>{const li=document.createElement('li'),button=document.createElement('button');button.type='button';button.innerHTML=`<span>${country.flag||'🌐'}</span>${country.name}<small>${country.code}</small>`;button.onclick=()=>choose(country);li.append(button);results.append(li)});results.hidden=!matches.length};
+  const render=(query=input.value)=>{const term=normalise(query);const matches=countries.filter(country=>normalise(`${country.name} ${country.search}`).includes(term));results.innerHTML='';matches.forEach(country=>{const li=document.createElement('li'),button=document.createElement('button');button.type='button';button.innerHTML=`<span class="country-option-flag">${country.flag||'🌐'}</span><span class="country-option-name">${country.name}</span><small>${country.code}</small>`;button.onclick=()=>choose(country);li.append(button);results.append(li)});results.hidden=!matches.length};
   input.placeholder='Rechercher un pays';input.autocomplete='off';input.addEventListener('focus',()=>{input.select();render('')});input.addEventListener('input',()=>{input.dataset.countryCode='';flag.textContent='🌐';toggleProvince();render()});input.addEventListener('blur',()=>setTimeout(()=>results.hidden=true,150));choose(countries.find(country=>country.code==='CD'));
 }
 setupCountrySearch();
@@ -135,7 +135,9 @@ function showMicrophoneError(error){
   const [title, message] = messages[name] || ['Microphone indisponible', "Une erreur technique a empêché l'accès au microphone. Réessayez ou importez un fichier audio."];
   showMicrophoneGuidance({ title, message, retry: true });
   audioStatus.classList.add('warn');
-  audioStatus.textContent = `Diagnostic : ${name}.`;
+  audioStatus.textContent = name === 'NotAllowedError'
+    ? "Autorisez le microphone pour ce site, puis choisissez « Réessayer »."
+    : 'Le microphone ne peut pas être utilisé pour le moment. Consultez les indications ci-dessus puis réessayez.';
 }
 function chooseRecorderMimeType(){
   if (typeof MediaRecorder.isTypeSupported !== 'function') return undefined;

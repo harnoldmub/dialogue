@@ -7,6 +7,8 @@ import { fileURLToPath } from 'node:url';
 import { z } from 'zod';
 import { ensureDatabase, saveContribution } from './server/db.js';
 import { putUpload } from './server/storage.js';
+import { bootstrapAdmin } from './server/admin-auth.js';
+import { registerAdminApi } from './server/admin-api.js';
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 const dist = path.join(root, 'dist');
@@ -55,9 +57,12 @@ app.use((_req, res, next) => {
   res.setHeader('X-Frame-Options', 'DENY');
   next();
 });
-app.use('/api', rateLimit({ windowMs: 15 * 60 * 1000, max: 10, standardHeaders: true, legacyHeaders: false, message: { error: 'Trop de tentatives depuis cet appareil. Réessayez dans quelques minutes.' } }));
+app.use(express.json({ limit: '1mb' }));
+const publicContributionLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 10, standardHeaders: true, legacyHeaders: false, message: { error: 'Trop de tentatives depuis cet appareil. Réessayez dans quelques minutes.' } });
+const adminLoginLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 5, standardHeaders: true, legacyHeaders: false, message: { error: 'Trop de tentatives. Réessayez dans quelques minutes.' } });
+registerAdminApi(app, adminLoginLimiter);
 
-app.post('/api/contributions', (req, res) => {
+app.post('/api/contributions', publicContributionLimiter, (req, res) => {
   upload(req, res, async uploadError => {
     if (uploadError) {
       if (uploadError.code === 'LIMIT_FILE_SIZE') return fail(res, 413, `Chaque fichier doit rester sous ${Math.round(MAX_UPLOAD_BYTES / 1024 / 1024)} Mo.`);
@@ -87,6 +92,8 @@ app.post('/api/contributions', (req, res) => {
         id, ...parsed.data,
         audioKey: audioRecord?.storageKey || null,
         audioDuration: parsed.data.audioDuration ?? null,
+        audioMime: audioRecord?.mimeType || null,
+        audioSize: audioRecord?.size || null,
         files: fileRecords
       });
       console.log(`Contribution ${contribution.reference} enregistrée (${parsed.data.theme})`);
@@ -107,9 +114,11 @@ app.use(express.static(dist, {
 }));
 app.get('/participer', (_req, res) => res.sendFile(path.join(dist, 'participer.html')));
 app.get('/mentions', (_req, res) => res.sendFile(path.join(dist, 'mentions.html')));
+app.get('/admin', (_req, res) => res.sendFile(path.join(dist, 'admin.html')));
 app.get('/{*splat}', (_req, res) => res.status(404).sendFile(path.join(dist, '404.html')));
 
 const port = Number(process.env.PORT || 3000);
 ensureDatabase()
+  .then(bootstrapAdmin)
   .then(() => app.listen(port, () => console.log(`CONGO DIALOGUE listening on ${port}`)))
   .catch(error => { console.error('Database initialization failed', error); process.exit(1); });

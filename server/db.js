@@ -1,12 +1,13 @@
 import pg from 'pg';
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
 
 const { Pool } = pg;
 const pool = process.env.DATABASE_URL
   ? new Pool({ connectionString: process.env.DATABASE_URL, ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : undefined })
   : null;
-const MIGRATION = '001_contributions.sql';
 const FALLBACK_FILE = 'data/contributions.json';
+
+export function getDatabase(){ return pool; }
 
 export async function ensureDatabase(){
   if (!pool) {
@@ -16,11 +17,14 @@ export async function ensureDatabase(){
   const client = await pool.connect();
   try {
     await client.query('CREATE TABLE IF NOT EXISTS schema_migrations (name TEXT PRIMARY KEY, applied_at TIMESTAMPTZ NOT NULL DEFAULT NOW())');
-    const exists = await client.query('SELECT 1 FROM schema_migrations WHERE name=$1', [MIGRATION]);
-    if (!exists.rowCount) {
-      await client.query(await readFile(new URL(`../migrations/${MIGRATION}`, import.meta.url), 'utf8'));
-      await client.query('INSERT INTO schema_migrations(name) VALUES($1)', [MIGRATION]);
-      console.log(`Applied ${MIGRATION}`);
+    const migrations = (await readdir(new URL('../migrations/', import.meta.url))).filter(name => name.endsWith('.sql')).sort();
+    for (const migration of migrations) {
+      const exists = await client.query('SELECT 1 FROM schema_migrations WHERE name=$1', [migration]);
+      if (!exists.rowCount) {
+        await client.query(await readFile(new URL(`../migrations/${migration}`, import.meta.url), 'utf8'));
+        await client.query('INSERT INTO schema_migrations(name) VALUES($1)', [migration]);
+        console.log(`Applied ${migration}`);
+      }
     }
     return true;
   } finally {
@@ -51,10 +55,10 @@ export async function saveContribution(input){
   try {
     await client.query('BEGIN');
     const contribution = await client.query(
-      `INSERT INTO contributions (id,first_name,last_name,email,phone,country,city,province,profile,theme,title,text_content,audio_key,audio_duration,status)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,'RECEIVED') RETURNING id,reference`,
+      `INSERT INTO contributions (id,first_name,last_name,email,phone,country,city,province,profile,theme,title,text_content,audio_key,audio_duration,audio_mime,audio_size,status)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,'RECEIVED') RETURNING id,reference`,
       [input.id, input.firstName, input.lastName, input.email, input.phone || null, input.country, input.city, input.province || null,
-       input.profile || null, input.theme, input.title || null, input.textContent || null, input.audioKey, input.audioDuration]
+       input.profile || null, input.theme, input.title || null, input.textContent || null, input.audioKey, input.audioDuration, input.audioMime || null, input.audioSize || null]
     );
     for (const file of input.files) {
       await client.query('INSERT INTO contribution_files (contribution_id,storage_key,original_name,mime_type,size) VALUES ($1,$2,$3,$4,$5)',

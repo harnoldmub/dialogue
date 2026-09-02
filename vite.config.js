@@ -7,6 +7,7 @@ export default defineConfig({
       input: {
         main: resolve(import.meta.dirname, 'index.html'),
         participer: resolve(import.meta.dirname, 'participer.html'),
+        admin: resolve(import.meta.dirname, 'admin.html'),
         mentions: resolve(import.meta.dirname, 'mentions.html'),
         notFound: resolve(import.meta.dirname, '404.html')
       }
