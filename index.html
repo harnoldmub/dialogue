@@ -206,9 +206,8 @@
       </section>
       <section class="chatbot" id="dialogue-assistant" aria-label="Assistant du Dialogue national" hidden>
         <div class="chatbot-head"><div><b>Assistant du Dialogue</b><span>Réponse immédiate</span></div><button class="chatbot-close" type="button" aria-label="Fermer l’assistant">×</button></div>
-        <div class="chatbot-messages" aria-live="polite"><p>Bonjour. Je peux vous aider à comprendre le dépôt d’une contribution.</p></div>
-        <div class="chatbot-prompts"><button type="button" data-chat-prompt="Comment déposer ?">Comment déposer ?</button><button type="button" data-chat-prompt="Quels formats ?">Quels formats ?</button><button type="button" data-chat-prompt="Ma contribution est-elle publique ?">Confidentialité</button></div>
-        <form class="chatbot-form"><label class="sr-only" for="chatbot-input">Votre question</label><input id="chatbot-input" name="question" placeholder="Écrivez votre question" autocomplete="off" /><button type="submit">Envoyer</button></form>
+        <div class="chatbot-messages" aria-live="polite"><p class="chatbot-step" id="chatbot-step"></p><h2 id="chatbot-question"></h2><p class="chatbot-subquestion" id="chatbot-subquestion"></p><div class="chatbot-options" id="chatbot-options"></div></div>
+        <div class="chatbot-foot"><button class="chatbot-back" type="button" hidden>Retour</button><a class="chatbot-deposit" href="/participer" hidden>Déposer ma contribution <span aria-hidden="true">→</span></a></div>
       </section>
       <button class="chatbot-launch" type="button" aria-expanded="false" aria-controls="dialogue-assistant"><span aria-hidden="true">◌</span> Besoin d’aide ?</button>
       <dialog id="apercu" class="notice-modal" aria-labelledby="apercu-title">
