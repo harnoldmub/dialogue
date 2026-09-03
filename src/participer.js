@@ -32,7 +32,7 @@ setupCountrySearch();
 
 const MAX_FILE_BYTES = 10 * 1024 * 1024;
 const MAX_FILES = 5;
-const MAX_SECONDS = 600;
+const MAX_SECONDS = 240;
 let selectedFiles = [];
 let audio = { blob: null, duration: 0 };
 let sending = false;

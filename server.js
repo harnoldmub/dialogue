@@ -29,7 +29,7 @@ const contributionSchema = z.object({
   theme: z.string().trim().min(1).max(100),
   title: z.string().trim().max(180).optional(),
   textContent: z.string().trim().max(20000).optional(),
-  audioDuration: z.coerce.number().int().min(0).max(3600).optional(),
+  audioDuration: z.coerce.number().int().min(0).max(240).optional(),
   consent: z.literal('on')
 });
 
