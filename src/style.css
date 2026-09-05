@@ -214,6 +214,9 @@ ul,ol{margin:0;padding:0;list-style:none}
   .presentation h2{font-size:36px}
 }
 @media(max-width:1000px){
+  .header-inner{gap:16px}
+  .main-nav{gap:16px;font-size:13px}
+  .header-action{display:none}
   .presentation,.editorial,.faq,.closing{grid-template-columns:1fr}
   .section-head{grid-template-columns:1fr;align-items:start}
   .themes,.journey{grid-template-columns:repeat(2,1fr)}

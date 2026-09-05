@@ -17,7 +17,11 @@ export default defineConfig({
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure'
   },
-  projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
+  projects: [
+    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
+    // Les pages publiques sont revérifiées sur le moteur de Safari, majoritaire sur mobile en RDC.
+    { name: 'webkit-public', grep: /@public/, use: { ...devices['Desktop Safari'] } }
+  ],
   webServer: {
     // Le serveur de test sert le build : on vérifie exactement ce qui part en production.
     command: 'npm run build && node --env-file-if-exists=.env server.js',
