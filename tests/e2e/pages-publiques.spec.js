@@ -99,4 +99,26 @@ test.describe('Pages publiques @public', () => {
     expect(response.status()).toBe(200);
     expect(response.headers()['content-type']).toContain('pdf');
   });
+
+  test('les marges et le défilement vertical restent disponibles @public', async ({ page }) => {
+    for (const width of [320, 390, 768]) {
+      await page.setViewportSize({ width, height: 844 });
+      await page.goto('/');
+      const gutters = await page.locator('.footer-grid, .footer-bottom').evaluateAll(nodes => nodes.map(node => ({
+        left: parseFloat(getComputedStyle(node).paddingLeft),
+        right: parseFloat(getComputedStyle(node).paddingRight)
+      })));
+      for (const gutter of gutters) {
+        expect(gutter.left).toBeGreaterThanOrEqual(20);
+        expect(gutter.right).toBeGreaterThanOrEqual(20);
+      }
+      await page.mouse.move(width / 2, 400);
+      await page.mouse.wheel(0, 700);
+      await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(100);
+      const headerTop = await page.locator('.site-header').evaluate(node => node.getBoundingClientRect().top);
+      expect(Math.abs(headerTop), 'le header reste fixé au viewport').toBeLessThan(2);
+      await page.goto('/participer');
+      expect(await page.locator('.form-layout').evaluate(node => parseFloat(getComputedStyle(node).paddingLeft))).toBeGreaterThanOrEqual(20);
+    }
+  });
 });

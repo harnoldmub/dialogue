@@ -95,6 +95,8 @@ const microphoneHelp = document.querySelector('#microphone-help');
 const microphoneInstructions = document.querySelector('#microphone-instructions');
 const bars = [...level.querySelectorAll('b i')];
 let recorder = null, elapsed = 0, ticker = null, previewUrl = null, isFinalizing = false;
+let requestingMicrophone = false, importingAudio = false;
+let capturedMs = 0, segmentStartedAt = 0;
 let audioContext = null, meter = null, peak = 0, startedAt = 0, silentWarned = false, micLabel = '';
 
 const getUserMediaAvailable = Boolean(navigator.mediaDevices?.getUserMedia);
@@ -144,6 +146,7 @@ function chooseRecorderMimeType(){
   return recorderMimeTypes.find(type => MediaRecorder.isTypeSupported(type));
 }
 function logRecorderDiagnostic(activeRecorder, recordingChunks, stream, finalBlob = null){
+  if (!import.meta.env.DEV) return;
   console.log('[Voice recorder] finalisation', {
     recorderState: activeRecorder.state,
     mimeType: activeRecorder.mimeType,
@@ -207,10 +210,24 @@ function stopMeter(){
 const renderTime = () => {
   timer.textContent = `${String(Math.floor(elapsed / 60)).padStart(2, '0')}:${String(elapsed % 60).padStart(2, '0')}`;
 };
+function updateElapsed(){
+  const activeMs = recorder?.state === 'recording' ? performance.now() - segmentStartedAt : 0;
+  elapsed = Math.min(MAX_SECONDS, Math.floor((capturedMs + activeMs) / 1000));
+  renderTime();
+}
 const startTicker = () => {
   clearInterval(ticker);
-  ticker = setInterval(() => { elapsed++; renderTime(); if (elapsed >= MAX_SECONDS) finishRecording(); }, 1000);
+  segmentStartedAt = performance.now();
+  ticker = setInterval(() => { updateElapsed(); if (elapsed >= MAX_SECONDS) finishRecording(); }, 100);
 };
+function syncAudioControls(){
+  const busy = requestingMicrophone || importingAudio || isFinalizing || Boolean(recorder && recorder.state !== 'inactive');
+  record.disabled = busy || sending;
+  retryMicrophone.disabled = busy || sending;
+  audioFile.disabled = busy || sending;
+  removeAudio.disabled = busy || sending;
+  submitButton.disabled = busy || sending;
+}
 function clearPreview(){
   preview.pause();
   preview.onloadedmetadata = null;
@@ -224,10 +241,8 @@ function clearPreview(){
 function showRecording(blob){
   clearPreview();
   previewUrl = URL.createObjectURL(blob);
-  preview.onloadedmetadata = () => {
-    // Certains navigateurs mettent à jour la durée après le premier chargement.
-    if (Number.isFinite(preview.duration) && preview.duration > 0) audio.duration = Math.ceil(preview.duration);
-  };
+  // La durée validée est conservée : l'arrondi des métadonnées de l'encodeur
+  // peut dépasser 240 s alors que la capture a bien été arrêtée à la limite.
   preview.onerror = () => {
     preview.hidden = true;
     showMicrophoneGuidance({
@@ -245,13 +260,16 @@ function showRecording(blob){
 }
 function finishRecording(){
   if (!recorder || recorder.state === 'inactive' || isFinalizing) return;
+  updateElapsed();
   isFinalizing = true;
+  syncAudioControls();
   clearInterval(ticker);
   // Safari/iOS finalise le dernier fragment à stop(). Ne pas appeler requestData() juste avant :
   // cette course pouvait laisser le tampon final vide sur certains appareils.
   try { recorder.stop(); }
   catch (error) {
     isFinalizing = false;
+    syncAudioControls();
     logMicrophoneError('recorder-stop', error);
     audioStatus.classList.add('warn');
     audioStatus.textContent = "L'enregistrement n'a pas pu être finalisé. Réessayez.";
@@ -265,6 +283,7 @@ function finishRecording(){
 }
 
 async function startRecording(){
+  if (requestingMicrophone || importingAudio || isFinalizing || sending || (recorder && recorder.state !== 'inactive')) return;
   if (!window.isSecureContext) {
     const error = new DOMException('A secure context is required.', 'SecurityError');
     logMicrophoneError('secure-context', error);
@@ -291,6 +310,9 @@ async function startRecording(){
   audioStatus.textContent = 'Autorisation du microphone en cours…';
   hideMicrophoneGuidance();
   let stream;
+  requestingMicrophone = true;
+  syncAudioControls();
+  preview.pause();
   try {
     // Appelé exclusivement depuis le clic « Démarrer » ou « Réessayer ».
     stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
@@ -298,12 +320,15 @@ async function startRecording(){
     const activeRecorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
     recorder = activeRecorder;
     const recordingChunks = [];
-    elapsed = 0; renderTime();
+    elapsed = 0; capturedMs = 0; renderTime();
     activeRecorder.ondataavailable = event => {
       if (event.data && event.data.size > 0) recordingChunks.push(event.data);
-      console.log('[Voice recorder] dataavailable', { size: event.data?.size || 0, type: event.data?.type || activeRecorder.mimeType, chunks: recordingChunks.length });
+      if (import.meta.env.DEV) console.log('[Voice recorder] dataavailable', { size: event.data?.size || 0, type: event.data?.type || activeRecorder.mimeType, chunks: recordingChunks.length });
     };
     activeRecorder.onstop = async () => {
+      clearInterval(ticker);
+      isFinalizing = true;
+      syncAudioControls();
       // Safari peut émettre le dernier dataavailable à la fin de la file d'événements de stop.
       await new Promise(resolve => setTimeout(resolve, 120));
       // Le type du fragment est la source fiable : recorder.mimeType peut être vide sur iOS.
@@ -315,6 +340,8 @@ async function startRecording(){
       stream.getTracks().forEach(track => track.stop());
       recorder = null;
       isFinalizing = false;
+      syncAudioControls();
+      pause.hidden = true; stop.hidden = true; dot.hidden = true;
       record.hidden = false;
       record.textContent = 'Enregistrer une nouvelle version';
       if (!blob.size) {
@@ -323,11 +350,18 @@ async function startRecording(){
         return;
       }
       audio = { blob, duration: elapsed };
+      audioFile.value = ''; audioFileName.textContent = '';
       showRecording(blob);
       removeAudio.hidden = false;
       audioStatus.classList.remove('warn');
       audioStatus.textContent = `Votre note vocale — ${timer.textContent}. Écoutez-la avant l’envoi.`;
       checkBlobAudio(blob);
+    };
+    activeRecorder.onerror = event => {
+      logMicrophoneError('recorder', event.error);
+      clearInterval(ticker);
+      // L'événement stop qui suit finalise les fragments déjà reçus.
+      audioStatus.textContent = 'Enregistrement interrompu. Finalisation de la partie enregistrée…';
     };
     activeRecorder.start();
     startTicker();
@@ -341,9 +375,20 @@ async function startRecording(){
     startMeter(stream).catch(error => logMicrophoneError('audio-meter', error));
   } catch (error) {
     stream?.getTracks().forEach(track => track.stop());
+    recorder = null;
+    clearInterval(ticker);
+    stopMeter();
     logMicrophoneError('get-user-media-or-recorder', error);
-    showMicrophoneError(error);
+    if (stream) {
+      showMicrophoneGuidance({ title: 'Enregistrement indisponible', message: 'Le microphone est autorisé, mais le navigateur n’a pas pu démarrer l’enregistrement. Réessayez ou importez un fichier audio.' });
+      audioStatus.textContent = 'Impossible de démarrer la note vocale.';
+    } else {
+      showMicrophoneError(error);
+    }
     record.hidden = false;
+  } finally {
+    requestingMicrophone = false;
+    syncAudioControls();
   }
 }
 
@@ -367,7 +412,7 @@ microphoneHelp?.addEventListener('click', () => {
 pause?.addEventListener('click', () => {
   if (!recorder) return;
   try {
-    if (recorder.state === 'recording') { recorder.pause(); clearInterval(ticker); pause.textContent = 'Reprendre'; dot.hidden = true; level.hidden = true; audioStatus.textContent = 'Enregistrement en pause.'; }
+    if (recorder.state === 'recording') { const segmentMs = performance.now() - segmentStartedAt; recorder.pause(); capturedMs += segmentMs; updateElapsed(); clearInterval(ticker); pause.textContent = 'Reprendre'; dot.hidden = true; level.hidden = true; audioStatus.textContent = 'Enregistrement en pause.'; }
     else if (recorder.state === 'paused') { recorder.resume(); startTicker(); pause.textContent = 'Mettre en pause'; dot.hidden = false; level.hidden = false; audioStatus.textContent = 'Enregistrement en cours.'; }
   } catch (error) {
     logMicrophoneError('pause-resume', error);
@@ -376,41 +421,84 @@ pause?.addEventListener('click', () => {
   }
 });
 stop?.addEventListener('click', finishRecording);
+// Les minuteries peuvent être suspendues en arrière-plan sur mobile.
+// Mettre la capture en pause évite d'enregistrer au-delà de la durée affichée.
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden && recorder?.state === 'recording' && !isFinalizing) {
+    pause.click();
+    audioStatus.textContent = 'Enregistrement mis en pause lorsque vous avez quitté la page. Choisissez « Reprendre » pour continuer.';
+  }
+});
+window.addEventListener('pagehide', () => {
+  clearInterval(ticker);
+  recorder?.stream.getTracks().forEach(track => track.stop());
+  stopMeter();
+});
 removeAudio?.addEventListener('click', () => {
   audio = { blob: null, duration: 0 };
+  audioFile.value = ''; audioFileName.textContent = '';
   clearPreview(); removeAudio.hidden = true;
   elapsed = 0; renderTime();
+  record.textContent = "Démarrer l'enregistrement";
+  hideMicrophoneGuidance();
+  audioStatus.classList.remove('warn');
   audioStatus.textContent = 'Enregistrement supprimé.';
 });
-audioFile?.addEventListener('change', () => {
+audioFile?.addEventListener('change', async () => {
   const file = audioFile.files[0];
   if (!file) return;
   if (file.size > MAX_FILE_BYTES) { audioStatus.classList.add('warn'); audioStatus.textContent = `${file.name} dépasse la limite de 10 Mo.`; audioFile.value = ''; return; }
-  audio = { blob: file, duration: 0 };
-  audioStatus.classList.remove('warn');
-  audioFileName.textContent = file.name;
-  audioStatus.textContent = `${file.name} sera envoyé comme note vocale.`;
+  if (importingAudio || requestingMicrophone || isFinalizing || recorder || sending) return;
+  importingAudio = true;
+  syncAudioControls();
+  audioStatus.textContent = 'Vérification de la durée du fichier audio…';
+  let context;
+  try {
+    context = new (window.AudioContext || window.webkitAudioContext)();
+    const buffer = await context.decodeAudioData(await file.arrayBuffer());
+    if (!Number.isFinite(buffer.duration) || buffer.duration <= 0) throw new Error('Ce fichier audio est vide ou illisible.');
+    if (buffer.duration > MAX_SECONDS) throw new Error('La note vocale doit durer 4 minutes au maximum. Raccourcissez le fichier puis réessayez.');
+    audio = { blob: file, duration: Math.ceil(buffer.duration) };
+    elapsed = audio.duration; renderTime();
+    hideMicrophoneGuidance();
+    showRecording(file);
+    removeAudio.hidden = false;
+    audioStatus.classList.remove('warn');
+    audioFileName.textContent = file.name;
+    audioStatus.textContent = `Votre note vocale — ${timer.textContent}. Écoutez-la avant l’envoi.`;
+  } catch (error) {
+    audioStatus.classList.add('warn');
+    audioStatus.textContent = error.name === 'EncodingError' ? 'Ce format audio ne peut pas être lu. Importez un fichier MP3, M4A ou WAV.' : error.message;
+    if (audio.blob) audioStatus.textContent += ' Votre note précédente est conservée.';
+  } finally {
+    await context?.close().catch(() => {});
+    audioFile.value = '';
+    importingAudio = false;
+    syncAudioControls();
+  }
 });
 
 /* Vérification sur le fichier lui-même : c'est la seule mesure qui fasse foi. */
 async function checkBlobAudio(blob){
+  let context;
   try {
-    const context = new (window.AudioContext || window.webkitAudioContext)();
+    context = new (window.AudioContext || window.webkitAudioContext)();
     const buffer = await context.decodeAudioData(await blob.arrayBuffer());
     let max = 0;
     for (let channel = 0; channel < buffer.numberOfChannels; channel++) {
       const data = buffer.getChannelData(channel);
       for (let i = 0; i < data.length; i += 64) max = Math.max(max, Math.abs(data[i]));
     }
-    context.close();
     // La jauge et le recorder reçoivent le même MediaStream. Si la jauge a capté du son,
     // un décodage Safari incomplet ne doit pas faire passer la note pour silencieuse.
-    if (max < 0.005 && peak < 0.008) {
+    if (audio.blob === blob && !recorder && max < 0.005 && peak < 0.008) {
       audioStatus.classList.add('warn');
       audioStatus.textContent = `La note enregistrée est silencieuse${micLabel ? ` : « ${micLabel} » n’a transmis aucun son` : ''}. Vérifiez l’entrée micro et son volume dans les réglages de votre appareil, puis recommencez.`;
     }
   } catch {
     // Décodage impossible : on laisse l'écoute manuelle trancher.
+  } finally {
+    await context?.close().catch(() => {});
   }
 }
 
@@ -420,7 +508,10 @@ function renderFiles(){
   selectedFiles.forEach((file, index) => {
     const item = document.createElement('li');
     const name = document.createElement('span');
-    name.innerHTML = `${file.name} <small>${(file.size / 1024 / 1024).toFixed(2)} Mo</small>`;
+    name.textContent = `${file.name} `;
+    const size = document.createElement('small');
+    size.textContent = `${(file.size / 1024 / 1024).toFixed(2)} Mo`;
+    name.append(size);
     const remove = document.createElement('button');
     remove.type = 'button'; remove.className = 'btn-sm quiet'; remove.textContent = 'Retirer';
     remove.addEventListener('click', () => { selectedFiles.splice(index, 1); renderFiles(); });
@@ -462,6 +553,10 @@ form.addEventListener('submit', async event => {
   event.preventDefault();
   if (sending) return;
   alertBox.textContent = '';
+  if (requestingMicrophone || importingAudio || isFinalizing || (recorder && recorder.state !== 'inactive')) {
+    alertBox.textContent = 'Terminez votre note vocale et attendez sa finalisation avant d’envoyer.';
+    return;
+  }
 
   const invalid = validate();
   if (invalid.length) {
@@ -477,14 +572,15 @@ form.addEventListener('submit', async event => {
   }
 
   sending = true;
-  submitButton.disabled = true;
+  syncAudioControls();
   submitButton.textContent = 'Envoi en cours…';
   try {
     const data = new FormData(form);
     data.delete('files');
     selectedFiles.forEach(file => data.append('files', file));
     if (audio.blob) {
-      const extension = (audio.blob.type || '').includes('mp4') ? 'm4a' : (audio.blob.name?.split('.').pop() || 'webm');
+      const mime = (audio.blob.type || '').split(';')[0];
+      const extension = ({ 'audio/mp4': 'm4a', 'audio/ogg': 'ogg', 'audio/webm': 'webm', 'audio/mpeg': 'mp3', 'audio/wav': 'wav' })[mime] || audio.blob.name?.split('.').pop() || 'webm';
       data.append('audio', audio.blob, `contribution.${extension}`);
       if (audio.duration) data.append('audioDuration', String(audio.duration));
     }
@@ -502,7 +598,7 @@ form.addEventListener('submit', async event => {
     alertBox.scrollIntoView({ block: 'center', behavior: 'smooth' });
   } finally {
     sending = false;
-    submitButton.disabled = false;
+    syncAudioControls();
     submitButton.innerHTML = 'Envoyer ma contribution <span class="arw" aria-hidden="true">→</span>';
   }
 });

@@ -8,6 +8,11 @@ const champsValides = {
 };
 
 test.describe('Dépôt public : contrôle des envois', () => {
+  test('explique le refus d’une durée vocale supérieure à quatre minutes', async ({ request }) => {
+    const response = await request.post('/api/contributions', { multipart: { ...champsValides, audioDuration: '241' } });
+    expect(response.status()).toBe(400);
+    expect((await response.json()).error).toContain('4 minutes');
+  });
   test('refuse un envoi sans consentement', async ({ request }) => {
     const { consent, ...sansConsentement } = champsValides;
     const response = await request.post('/api/contributions', { multipart: sansConsentement });

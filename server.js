@@ -74,6 +74,7 @@ app.post('/api/contributions', publicContributionLimiter, (req, res) => {
     const parsed = contributionSchema.safeParse(req.body);
     if (!parsed.success) {
       const field = parsed.error.issues[0]?.path[0];
+      if (field === 'audioDuration') return fail(res, 400, 'La note vocale doit durer 4 minutes au maximum.');
       return fail(res, 400, field === 'consent'
         ? 'Vous devez accepter le traitement de votre contribution.'
         : 'Certaines informations obligatoires sont manquantes ou incorrectes.');
