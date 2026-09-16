@@ -65,6 +65,8 @@ if (statement) {
 const chatbot = document.querySelector('#dialogue-assistant');
 const chatbotLaunch = document.querySelector('.chatbot-launch');
 if (chatbot && chatbotLaunch) {
+  // Le bouton est masqué dans le HTML : sans script, l'assistant ne servirait à rien.
+  chatbotLaunch.hidden = false;
   const questionNode = chatbot.querySelector('#chatbot-question');
   const subquestionNode = chatbot.querySelector('#chatbot-subquestion');
   const stepNode = chatbot.querySelector('#chatbot-step');
